@@ -49,10 +49,11 @@ public class RubikSide {
 
     // TODO: fix bug in last column.
     public void rotateClockwise() {
+        int [][] columnsCopy = this.columns.clone();
+        int [][] rowsCopy = this.rows.clone();
         for (int i = 0; i < size; i++) {
-            int[] columnCopy = getColumn(i);
-            setColumn(i, getRow(size - (1 + i)));
-            setRow(i, reversed(columnCopy));
+            setColumn(i, rowsCopy[size - (1 + i)]);
+            setRow(i, reversed(columnsCopy[i]));
         }
     }
 
