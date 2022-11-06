@@ -77,11 +77,12 @@ public class RubikSide {
         }
         System.out.println("Rows: \n" + dataRows);
         System.out.println("Columns: \n" + dataColumns);
-        
+
     }
 
+    // Fill with different values, useful for testing.
     public void fill() {
-        for (int i = 0; i < getSize(); i++) {
+        for (int i = 0; i < size; i++) {
             for (int j = 0; j < getSize(); j++) {
                 this.rows[i][j] = (i * getSize()) + (j + 1);
                 this.columns[j][i] = (i * getSize()) + (j + 1);

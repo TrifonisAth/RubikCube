@@ -45,6 +45,7 @@ public class RubikCube {
         return this.size;
     }
 
+    // Turn selected row to the right if direction is 1, to the left if direction is -1.
     public void turnRow(int row, int direction) {
         int[] rowCopy = getFront().getRow(row);
         // Right turn.
