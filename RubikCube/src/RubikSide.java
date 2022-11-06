@@ -11,8 +11,8 @@ public class RubikSide {
     }
 
     private void fillSameValue(int value) {
-        for (int i = 0; i < getSize(); i++) {
-            for (int j = 0; j < getSize(); j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 this.rows[i][j] = value;
                 this.columns[j][i] = value;
             }
@@ -40,17 +40,18 @@ public class RubikSide {
     }
 
     public void rotateAnticlockwise() {
-        for (int i = 0; i < getSize(); i++) {
+        for (int i = 0; i < size; i++) {
             int[] rowCopy = getRow(i);
-            setRow(i, getColumn(getSize() - (1 + i)));
+            setRow(i, getColumn(size - (1 + i)));
             setColumn(i, reversed(rowCopy));
         }
     }
 
+    // TODO: fix bug in last column.
     public void rotateClockwise() {
-        for (int i = 0; i < getSize(); i++) {
+        for (int i = 0; i < size; i++) {
             int[] columnCopy = getColumn(i);
-            setColumn(i, getRow(getSize() - (1 + i)));
+            setColumn(i, getRow(size - (1 + i)));
             setRow(i, reversed(columnCopy));
         }
     }
