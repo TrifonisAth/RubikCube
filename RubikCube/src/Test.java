@@ -13,6 +13,9 @@ public class Test {
         public void testRotation() {
             System.out.println("Testing clockwise rotation");
             cube.getFront().rotateClockwise();
+            cube.getFront().rotateAnticlockwise();
+            cube.getFront().rotateAnticlockwise();
+            cube.getFront().rotateAnticlockwise();
             cube.getFront().printData();
         }
 }

@@ -40,10 +40,11 @@ public class RubikSide {
     }
 
     public void rotateAnticlockwise() {
+        int [][] columnsCopy = this.columns.clone();
+        int [][] rowsCopy = this.rows.clone();
         for (int i = 0; i < size; i++) {
-            int[] rowCopy = getRow(i);
-            setRow(i, getColumn(size - (1 + i)));
-            setColumn(i, reversed(rowCopy));
+            setRow(i, columnsCopy[size - (1 + i)]);
+            setColumn(i, reversed(rowsCopy[i]));
         }
     }
 
