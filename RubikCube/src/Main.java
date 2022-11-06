@@ -3,5 +3,7 @@ public class Main {
         Test test = new Test();
         test.init(3);
         test.testRotation();
+        RubikCube cube = new RubikCube(3);
+        cube.printCube();
     }
 }
