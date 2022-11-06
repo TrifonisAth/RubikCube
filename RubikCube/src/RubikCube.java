@@ -1,13 +1,13 @@
 import java.util.Arrays;
 
 public class RubikCube {
-    private RubikSide front;
-    private RubikSide back;
-    private RubikSide left;
-    private RubikSide right;
-    private RubikSide top;
-    private RubikSide bottom;
-    private int size;
+    private final RubikSide front;
+    private final RubikSide back;
+    private final RubikSide left;
+    private final RubikSide right;
+    private final RubikSide top;
+    private final RubikSide bottom;
+    private final int size;
 
     public RubikCube(int size) {
         this.size = size;
@@ -77,7 +77,6 @@ public class RubikCube {
 
     // Print cube sides.
     public void printCube() {
-        String[][] cube = new String[getSize() * 2 + 1][getSize() * 2 + 1];
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < size; i++) {
             str.append("\t".repeat(size/2 +1).concat("\t").concat(Arrays.toString(getTop().getRow(i))));

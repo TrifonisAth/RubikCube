@@ -1,7 +1,7 @@
 public class RubikSide {
     private final int size;
-    private int[][] rows;
-    private int[][] columns;
+    private final int[][] rows;
+    private final int[][] columns;
 
     public RubikSide(int size, int value) {
         this.size = size;

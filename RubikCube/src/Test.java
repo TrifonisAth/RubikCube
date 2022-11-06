@@ -6,16 +6,12 @@ public class Test {
 
         public void init(int size) {
             this.cube = new RubikCube(size);
-            cube.getFront().fill();
-            cube.getFront().printData();
+
         }
 
         public void testRotation() {
             System.out.println("Testing clockwise rotation");
-            cube.getFront().rotateClockwise();
-            cube.getFront().rotateAnticlockwise();
-            cube.getFront().rotateAnticlockwise();
-            cube.getFront().rotateAnticlockwise();
-            cube.getFront().printData();
+            cube.turnRow(0, -1);
+            cube.printCube();
         }
 }
