@@ -73,11 +73,27 @@ public class RubikCube {
                 getBottom().rotateAnticlockwise();
             }
         }
+        updateColumns(row);
+    }
+
+    public void updateRows(int col){
+        getFront().updateRow(col);
+        getBack().updateRow(size - (1 + col));
+        getTop().updateRow(col);
+        getBottom().updateRow(col);
+    }
+
+    public void updateColumns(int row){
+        getFront().updateColumn(row);
+        getBack().updateColumn(row);
+        getLeft().updateColumn(row);
+        getRight().updateColumn(row);
     }
 
     // Print cube sides.
     public void printCube() {
         StringBuilder str = new StringBuilder();
+        str.append("      -------- TOP --------\n");
         for (int i = 0; i < size; i++) {
             str.append("\t".repeat(size/2 +1).concat("\t").concat(Arrays.toString(getTop().getRow(i))));
             str.append("\n");
@@ -95,8 +111,56 @@ public class RubikCube {
             str.append("\t".repeat(size/2 + 1).concat("\t").concat(Arrays.toString(getBottom().getRow(i))));
             str.append("\n");
         }
+        str.append("      ------ BOTTOM -------");
         System.out.println(str);
     }
 
 
+    public void turnCol(int col, int direction) {
+        int[] colCopy = getFront().getColumn(col);
+        // Turn up.
+        if (direction == 1){
+            getFront().setColumn(col, getBottom().getColumn(col));
+            getBottom().setColumn(col, reversed(getBack().getColumn(size - (col + 1))));
+            getBack().setColumn(size - (col + 1), reversed(getTop().getColumn(col)));
+            getTop().setColumn(col, colCopy);
+            if (col == 0) {
+                getLeft().rotateAnticlockwise();
+            } else if (col == getSize() - 1) {
+                getRight().rotateClockwise();
+            }
+            // Turn down.
+        } else if (direction == -1){
+            getFront().setColumn(col, getTop().getColumn(col));
+            getTop().setColumn(col, reversed(getBack().getColumn(size - (col + 1))));
+            getBack().setColumn(size - (col + 1),  reversed(getBottom().getColumn(col)));
+            getBottom().setColumn(col, colCopy);
+
+           if (col == 0) {
+               getLeft().rotateClockwise();
+           } else if (col == getSize() - 1) {
+               getRight().rotateAnticlockwise();
+           }
+        }
+        updateRows(col);
+    }
+
+    public int[] reversed(int[] array) {
+        int[] reversedArray = new int[array.length];
+        for (int i = 0; i < array.length; i++) {
+            reversedArray[i] = array[array.length - (i + 1)];
+        }
+        return reversedArray;
+    }
+
+    public void rotateBackSide(int direction){
+        RubikSide backCopy = new RubikSide(getBack());
+        if (direction == 1){
+            // Rotate back side clockwise.
+
+        } else if (direction == -1){
+            // Rotate back side anticlockwise.
+
+        }
+    }
 }

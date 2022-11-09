@@ -59,13 +59,24 @@ public class RubikSide {
     }
 
     public int[] reversed(int[] array) {
-        int[] reversed = new int[array.length];
+        int[] reversedArray = new int[array.length];
         for (int i = 0; i < array.length; i++) {
-            reversed[i] = array[array.length - (i + 1)];
+            reversedArray[i] = array[array.length - (i + 1)];
         }
-        return reversed;
+        return reversedArray;
     }
 
+    public void updateRow(int col){
+        for (int i = 0; i < size; i++) {
+            this.rows[i][col] = this.columns[col][i];
+        }
+    }
+
+    public void updateColumn(int row){
+        for (int i = 0; i < size; i++) {
+            this.columns[i][row] = this.rows[row][i];
+        }
+    }
 
     public void printData() {
         StringBuilder dataRows = new StringBuilder();
@@ -83,7 +94,7 @@ public class RubikSide {
 
     }
 
-    // Fill with different values, useful for testing.
+    // Fill with different values, useful for testing a single side.
     public void fill() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < getSize(); j++) {
