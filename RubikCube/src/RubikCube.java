@@ -178,7 +178,25 @@ public class RubikCube {
     }
 
     public void rotateMid(int direction){
-        
+        int[] leftCol = getLeft().getColumn(1);
+        if (direction == 1){
+            // Rotate mid anti-clockwise.
+            getLeft().setColumn(1, getBottom().getRow(1));
+            getBottom().setRow(1, reversed(getRight().getColumn(1)));
+            getRight().setColumn(1, getTop().getRow(1));
+            getTop().setRow(1, reversed(leftCol));
+        } else if (direction == -1){
+            // Rotate mid clockwise.
+            getLeft().setColumn(1, reversed(getTop().getRow(1)));
+            getTop().setRow(1, getRight().getColumn(1));
+            getRight().setColumn(1, reversed(getBottom().getRow(1)));
+            getBottom().setRow(1, leftCol);
+        }
+        // Update rows and columns.
+        getLeft().updateRow(1);
+        getBottom().updateColumn(1);
+        getRight().updateRow(1);
+        getTop().updateColumn(1);
     }
 
     // Copy cube and change view, so that left side is on the front.
