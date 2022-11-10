@@ -12,6 +12,6 @@ public class Main {
         test.testBackRot();
 
         test.init(3);
-        test.testBackRot();
+        test.testCompositeRot();
     }
 }
