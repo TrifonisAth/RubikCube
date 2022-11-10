@@ -154,13 +154,41 @@ public class RubikCube {
     }
 
     public void rotateBackSide(int direction){
-        RubikSide backCopy = new RubikSide(getBack());
+        int[] leftCol = getLeft().getColumn(0);
         if (direction == 1){
-            // Rotate back side clockwise.
-
+            // Rotate back side anti-clockwise.
+            getBack().rotateAnticlockwise();
+            getLeft().setColumn(0, getBottom().getRow(getSize() - 1));
+            getBottom().setRow(getSize() - 1, reversed(getRight().getColumn(getSize() - 1)));
+            getRight().setColumn(getSize() - 1, getTop().getRow(0));
+            getTop().setRow(0, reversed(leftCol));
         } else if (direction == -1){
-            // Rotate back side anticlockwise.
-
+            // Rotate back side clockwise.
+            getBack().rotateClockwise();
+            getLeft().setColumn(0, reversed(getTop().getRow(0)));
+            getTop().setRow(0, getRight().getColumn(getSize() - 1));
+            getRight().setColumn(getSize() - 1, reversed(getBottom().getRow(getSize() - 1)));
+            getBottom().setRow(getSize() - 1, leftCol);
         }
+        // Update rows and columns.
+        getLeft().updateRow(0);
+        getBottom().updateColumn(getSize() - 1);
+        getRight().updateRow(getSize() - 1);
+        getTop().updateColumn(0);
+    }
+
+    public void rotateMid(int direction){
+        
+    }
+
+    // Copy cube and change view, so that left side is on the front.
+    public RubikCube(RubikCube cube) {
+        this.size = cube.getSize();
+        this.front = cube.getLeft();
+        this.right = cube.getFront();
+        this.back = cube.getRight();
+        this.left = cube.getBack();
+        this.top = new RubikSide(cube.getTop(), true);
+        this.bottom = new RubikSide(cube.getBottom(), false);
     }
 }
