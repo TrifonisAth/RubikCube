@@ -10,25 +10,6 @@ public class RubikSide {
         fillSameValue(value);
     }
 
-    // Change view of the side.
-    public RubikSide(RubikSide side, boolean isTop) {
-        this.size = side.getSize();
-        this.rows = new int[size][size];
-        this.columns = new int[size][size];
-        for(int i = 0; i < size; i++){
-            if(isTop){
-                // Top side.
-                this.rows[i] = side.getColumn(side.getSize() - (i + 1));
-                this.columns[i] = reversed(side.getRow(i));
-            }
-            else{
-                // Bottom side.
-                this.rows[i] = reversed(side.getColumn(i));
-                this.columns[i] = side.getRow(side.getSize() - (i + 1));
-            }
-        }
-    }
-
     private void fillSameValue(int value) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {

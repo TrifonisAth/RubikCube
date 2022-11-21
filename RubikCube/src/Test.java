@@ -10,35 +10,27 @@ public class Test {
         }
 
         public void testRotation() {
+            System.out.println("Testing front clockwise rotation");
             cube.printCube();
-            System.out.println("Testing clockwise rotation");
-            cube.turnRow(2, -1);
+            cube.F_l();
+            cube.R_l();
+            cube.U_l();
+            cube.B_l();
+            cube.L_l();
+            cube.D_l();
             cube.printCube();
         }
 
         public void testBackRot(){
             System.out.println("Testing backside rotation");
-            cube.rotateBackSide(1);
-            cube.printCube();
-            cube.rotateBackSide(-1);
             cube.printCube();
         }
 
         public void testMidRot() {
             System.out.println("Testing Mid Rotation");
-            cube.rotateMid(1);
-            cube.printCube();
-            cube.rotateMid(1);
-            cube.printCube();
-            cube.rotateMid(1);
         }
 
         public void testCompositeRot() {
             System.out.println("Testing back -> mid -> collumn rotations");
-            cube.rotateMid(-1);
-            cube.printCube();
-            cube.rotateBackSide(-1);
-            cube.printCube();
-            cube.turnCol(2,-1);
         }
 }
