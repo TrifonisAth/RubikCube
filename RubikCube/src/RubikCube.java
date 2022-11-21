@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class RubikCube {
+public class RubikCube  implements  CubeMovements{
     private final RubikSide front;
     private final RubikSide back;
     private final RubikSide left;
@@ -50,8 +50,8 @@ public class RubikCube {
     // Turn selected row to the right if direction is 1, to the left if direction is -1.
     public void turnRow(int row, int direction) {
         int[] rowCopy = getFront().getRow(row);
-        // Right turn.
-        if (direction == 1) {
+        // Right turn, anticlockwise rotation (Top view)
+        if (direction == -1) {
             getFront().setRow(row, getLeft().getRow(row));
             getLeft().setRow(row, getBack().getRow(row));
             getBack().setRow(row, getRight().getRow(row));
@@ -61,8 +61,8 @@ public class RubikCube {
             } else if(row == getSize() - 1) {
                 getBottom().rotateClockwise();
             }
-            // Left turn.
-        } else if (direction == -1) {
+            // Left turn. Clockwise rotation (Top view)
+        } else if (direction == 1) {
             getFront().setRow(row, getRight().getRow(row));
             getRight().setRow(row, getBack().getRow(row));
             getBack().setRow(row, getLeft().getRow(row));
@@ -155,14 +155,14 @@ public class RubikCube {
 
     public void rotateBackSide(int direction){
         int[] leftCol = getLeft().getColumn(0);
-        if (direction == 1){
+        if (direction == -1){
             // Rotate back side anti-clockwise.
             getBack().rotateAnticlockwise();
             getLeft().setColumn(0, getBottom().getRow(getSize() - 1));
             getBottom().setRow(getSize() - 1, reversed(getRight().getColumn(getSize() - 1)));
             getRight().setColumn(getSize() - 1, getTop().getRow(0));
             getTop().setRow(0, reversed(leftCol));
-        } else if (direction == -1){
+        } else if (direction == 1){
             // Rotate back side clockwise.
             getBack().rotateClockwise();
             getLeft().setColumn(0, reversed(getTop().getRow(0)));
@@ -179,13 +179,13 @@ public class RubikCube {
 
     public void rotateMid(int direction){
         int[] leftCol = getLeft().getColumn(1);
-        if (direction == 1){
+        if (direction == -1){
             // Rotate mid anti-clockwise.
             getLeft().setColumn(1, getBottom().getRow(1));
             getBottom().setRow(1, reversed(getRight().getColumn(1)));
             getRight().setColumn(1, getTop().getRow(1));
             getTop().setRow(1, reversed(leftCol));
-        } else if (direction == -1){
+        } else if (direction == 1){
             // Rotate mid clockwise.
             getLeft().setColumn(1, reversed(getTop().getRow(1)));
             getTop().setRow(1, getRight().getColumn(1));
@@ -199,14 +199,107 @@ public class RubikCube {
         getTop().updateColumn(1);
     }
 
-    // Copy cube and change view, so that left side is on the front.
-    public RubikCube(RubikCube cube) {
-        this.size = cube.getSize();
-        this.front = cube.getLeft();
-        this.right = cube.getFront();
-        this.back = cube.getRight();
-        this.left = cube.getBack();
-        this.top = new RubikSide(cube.getTop(), true);
-        this.bottom = new RubikSide(cube.getBottom(), false);
+    public  void rotateFrontSide(int direction){
+        int[] leftCol = getLeft().getColumn(getSize() - 1);
+        if (direction == -1){
+            // Rotate front side anti-clockwise.
+            getFront().rotateAnticlockwise();
+            getLeft().setColumn(getSize() - 1, reversed(getTop().getRow(2)));
+            getTop().setRow(2, getRight().getColumn(0));
+            getRight().setColumn(0, reversed(getBottom().getRow(0)));
+            getBottom().setRow(0, leftCol);
+        } else if (direction == 1){
+            // Rotate front side clockwise.
+            getFront().rotateClockwise();
+            getLeft().setColumn(getSize() - 1, getBottom().getRow(0));
+            getBottom().setRow(0, reversed(getRight().getColumn(0)));
+            getRight().setColumn(0, getTop().getRow(2));
+            getTop().setRow(2, reversed(leftCol));
+        }
+        // Update rows and columns.
+        getLeft().updateRow(getSize() - 1);
+        getBottom().updateColumn(0);
+        getRight().updateRow(0);
+        getTop().updateColumn(getSize() - 1);
+    }
+
+    @Override
+    public void F_l() {
+        rotateFrontSide(-1);
+    }
+
+    @Override
+    public void F_r() {
+        rotateFrontSide(1);
+    }
+
+    @Override
+    public void B_l() {
+        rotateBackSide(-1);
+    }
+
+    @Override
+    public void B_r() {
+        rotateBackSide(1);
+    }
+
+    @Override
+    public void U_l() {
+        turnRow(0, -1);
+    }
+
+    @Override
+    public void U_r() {
+        turnRow(0, 1);
+    }
+
+    @Override
+    public void D_l() {
+        turnRow(getSize() - 1, 1);
+    }
+
+    @Override
+    public void D_r() {
+        turnRow(getSize() - 1, -1);
+    }
+
+    @Override
+    public void L_l() {
+        turnCol(0, 1);
+    }
+
+    @Override
+    public void L_r() {
+        turnCol(0, -1);
+    }
+
+    @Override
+    public void R_l() {
+        turnCol(getSize() - 1, -1);
+    }
+
+    @Override
+    public void R_r() {
+        turnCol(getSize() - 1, 1);
+    }
+
+    @Override
+    public void V_u() {
+        turnCol(1, 1);
+    }
+
+    @Override
+    public void V_d() {
+        turnCol(1, -1);
+    }
+
+    @Override
+    public void H_l() {
+        turnRow(1, -1);
+    }
+
+    @Override
+    public void H_r() {
+        turnRow(1, 1);
     }
 }
