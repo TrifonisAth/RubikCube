@@ -8,6 +8,11 @@ public class RubikCube  implements  CubeMovements{
     private final RubikSide top;
     private final RubikSide bottom;
     private final int size;
+    private final byte[] squares = new byte[54];
+    private final Corner[] corners;
+    private final Edge[] edges;
+
+
 
     public RubikCube(int size) {
         this.size = size;
@@ -17,6 +22,11 @@ public class RubikCube  implements  CubeMovements{
         this.left = new RubikSide(size, 4);
         this.top = new RubikSide(size, 5);
         this.bottom = new RubikSide(size, 6);
+        for (byte i = 0; i < 6; i++) {
+            for (byte j = 0; j < 9; j++) {
+                this.squares[i * 9 + j] = i;
+            }
+        }
     }
 
     public RubikSide getFront() {
@@ -114,6 +124,32 @@ public class RubikCube  implements  CubeMovements{
         str.append("      ------ BOTTOM -------");
         System.out.println(str);
     }
+
+    public void printCube2() {
+        StringBuilder str = new StringBuilder();
+        str.append("      -------- TOP --------\n");
+        for (int i = 0; i < size; i++) {
+            str.append("\t".repeat(size/2 +1).concat("\t").concat(String.valueOf(squares[36 + i * 3])).concat(String.valueOf(squares[36 + i * 3 + 1])).concat(String.valueOf(squares[36 + i * 3 + 2])));
+            str.append("\n");
+        }
+        str.append("\n");
+        for (int i = 0; i < size; i++){
+            str.append(squares[27 + i * 3]).append(squares[27 + i * 3 + 1]).append(squares[27 + i * 3 + 2]).append("\t");
+            str.append(squares[27 + i * 3]).append(squares[27 + i * 3 + 1]).append(squares[27 + i * 3 + 2]).append("\t");
+            str.append(squares[27 + i * 3]).append(squares[27 + i * 3 + 1]).append(squares[27 + i * 3 + 2]).append("\t");
+            str.append(Arrays.toString(getBack().getRow(i)));
+            str.append("\n");
+        }
+        str.append("\n");
+        for (int i = 0; i < size; i++) {
+            str.append("\t".repeat(size/2 + 1).concat("\t").concat(Arrays.toString(getBottom().getRow(i))));
+            str.append("\n");
+        }
+        str.append("      ------ BOTTOM -------");
+        System.out.println(str);
+    }
+
+
 
 
     public void turnCol(int col, int direction) {

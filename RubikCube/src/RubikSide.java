@@ -2,12 +2,14 @@ public class RubikSide {
     private final int size;
     private final int[][] rows;
     private final int[][] columns;
+    private int centralPiece;
 
     public RubikSide(int size, int value) {
         this.size = size;
         this.rows = new int[size][size];
         this.columns = new int[size][size];
         fillSameValue(value);
+        this.centralPiece = value;
     }
 
     private void fillSameValue(int value) {

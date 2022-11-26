@@ -12,12 +12,23 @@ public class Test {
         public void testRotation() {
             System.out.println("Testing front clockwise rotation");
             cube.printCube();
-            cube.F_l();
+            cube.F_r();
+            cube.F_r();
+            cube.F_r();
+            cube.B_r();
+            cube.B_r();
+            cube.B_r();
+            cube.L_l();
+            cube.L_l();
+            cube.L_l();
+            cube.R_l();
+            cube.R_l();
             cube.R_l();
             cube.U_l();
-            cube.B_l();
-            cube.L_l();
+            cube.U_r();
             cube.D_l();
+            cube.D_l();
+            cube.F_r();
             cube.printCube();
         }
 
@@ -33,4 +44,8 @@ public class Test {
         public void testCompositeRot() {
             System.out.println("Testing back -> mid -> collumn rotations");
         }
+
+    public void printData() {
+
+    }
 }
