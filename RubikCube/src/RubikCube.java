@@ -1,5 +1,4 @@
 public interface RubikCube {
-
     // Rotate the front face of the cube anticlockwise.
     public void F_l();
 
