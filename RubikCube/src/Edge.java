@@ -15,6 +15,22 @@ public class Edge {
         this.correctPosition = edge.correctPosition;
     }
 
+    public char getTopTile() {
+        if (this.orientation) {
+            return this.tiles[0];
+        } else {
+            return this.tiles[1];
+        }
+    }
+
+    public char getBottomTile() {
+        if (this.orientation) {
+            return this.tiles[1];
+        } else {
+            return this.tiles[0];
+        }
+    }
+
     public void flipOrientation(){
         this.orientation = !this.orientation;
     }

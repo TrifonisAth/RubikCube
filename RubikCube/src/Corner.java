@@ -17,6 +17,36 @@ public class Corner {
         this.correctPosition = corner.correctPosition;
     }
 
+    public char getLeftTile() {
+        if (this.orientation == 0) {
+            return this.tiles[0];
+        } else if (this.orientation == 1) {
+            return this.tiles[2];
+        } else {
+            return this.tiles[1];
+        }
+    }
+
+    public char getRightTile() {
+        if (this.orientation == 0) {
+            return this.tiles[2];
+        } else if (this.orientation == 1) {
+            return this.tiles[1];
+        } else {
+            return this.tiles[0];
+        }
+    }
+
+    public char getTopTile() {
+        if (this.orientation == 0) {
+            return this.tiles[1];
+        } else if (this.orientation == 1) {
+            return this.tiles[0];
+        } else {
+            return this.tiles[2];
+        }
+    }
+
     public char[] getTiles() {
         return this.tiles;
     }
@@ -31,11 +61,6 @@ public class Corner {
 
     public void rotateCounterClockwise() {
         this.orientation = (this.orientation + 2) % 3;
-    }
-
-    @Override
-    public String toString() {
-        return
     }
 
 }
