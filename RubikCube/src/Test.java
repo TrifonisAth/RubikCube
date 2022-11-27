@@ -4,9 +4,8 @@ public class Test {
     private int testFailed;
     private Cube cube;
 
-        public void init(int size) {
-            this.cube = new Cube(size);
-
+        public void init() {
+            this.cube = new Cube();
         }
 
         public void testRotation() {

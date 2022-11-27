@@ -8,28 +8,28 @@ public class Cube implements RubikCube {
         this.initCube();
     }
 
-    private void initCube(){
-        corners[0] = new Corner(new char[]{'U', 'L', 'B'});
-        corners[1] = new Corner(new char[]{'U', 'R', 'B'});
-        corners[2] = new Corner(new char[]{'U', 'L', 'F'});
-        corners[3] = new Corner(new char[]{'U', 'R', 'F'});
-        corners[4] = new Corner(new char[]{'D', 'L', 'B'});
-        corners[5] = new Corner(new char[]{'D', 'R', 'B'});
-        corners[6] = new Corner(new char[]{'D', 'L', 'F'});
-        corners[7] = new Corner(new char[]{'D', 'R', 'F'});
+    private void initCube() {
+        corners[0] = new Corner(new char[]{'U', 'L', 'B'}, 0);
+        corners[1] = new Corner(new char[]{'U', 'R', 'B'}, 1);
+        corners[2] = new Corner(new char[]{'U', 'L', 'F'}, 2);
+        corners[3] = new Corner(new char[]{'U', 'R', 'F'}, 3);
+        corners[4] = new Corner(new char[]{'D', 'L', 'B'}, 4);
+        corners[5] = new Corner(new char[]{'D', 'R', 'B'}, 5);
+        corners[6] = new Corner(new char[]{'D', 'L', 'F'}, 6);
+        corners[7] = new Corner(new char[]{'D', 'R', 'F'}, 7);
 
-        edges[0] = new Edge(new char[]{'U', 'L'});
-        edges[1] = new Edge(new char[]{'U', 'R'});
-        edges[2] = new Edge(new char[]{'U', 'B'});
-        edges[3] = new Edge(new char[]{'U', 'F'});
-        edges[4] = new Edge(new char[]{'L', 'B'});
-        edges[5] = new Edge(new char[]{'R', 'B'});
-        edges[6] = new Edge(new char[]{'L', 'F'});
-        edges[7] = new Edge(new char[]{'R', 'F'});
-        edges[8] = new Edge(new char[]{'D', 'L'});
-        edges[9] = new Edge(new char[]{'D', 'R'});
-        edges[10] = new Edge(new char[]{'D', 'B'});
-        edges[11] = new Edge(new char[]{'D', 'F'});
+        edges[0] = new Edge(new char[]{'U', 'L'}, 0);
+        edges[1] = new Edge(new char[]{'U', 'R'}, 1);
+        edges[2] = new Edge(new char[]{'U', 'B'}, 2);
+        edges[3] = new Edge(new char[]{'U', 'F'}, 3);
+        edges[4] = new Edge(new char[]{'L', 'B'}, 4);
+        edges[5] = new Edge(new char[]{'R', 'B'}, 5);
+        edges[6] = new Edge(new char[]{'L', 'F'}, 6);
+        edges[7] = new Edge(new char[]{'R', 'F'}, 7);
+        edges[8] = new Edge(new char[]{'D', 'L'}, 8);
+        edges[9] = new Edge(new char[]{'D', 'R'}, 9);
+        edges[10] = new Edge(new char[]{'D', 'B'}, 10);
+        edges[11] = new Edge(new char[]{'D', 'F'}, 11);
 
         center[0] = 'F';
         center[1] = 'R';
@@ -62,6 +62,11 @@ public class Cube implements RubikCube {
         edges[11] = edges[7];
         edges[7] = edges[3];
         edges[3] = tempEdge;
+        // Update corner orientation.
+        corners[2].rotateClockwise();
+        corners[3].rotateClockwise();
+        corners[6].rotateClockwise();
+        corners[7].rotateClockwise();
     }
 
     private void frontCounterClockwise() {
@@ -77,6 +82,11 @@ public class Cube implements RubikCube {
         edges[3] = edges[7];
         edges[7] = edges[11];
         edges[11] = tempEdge;
+        // Update corner orientation.
+        corners[2].rotateCounterClockwise();
+        corners[3].rotateCounterClockwise();
+        corners[6].rotateCounterClockwise();
+        corners[7].rotateCounterClockwise();
     }
 
     private void backClockwise() {
@@ -92,6 +102,11 @@ public class Cube implements RubikCube {
         edges[10] = edges[4];
         edges[4] = edges[2];
         edges[2] = tempEdge;
+        // Update corner orientation.
+        corners[0].rotateClockwise();
+        corners[1].rotateClockwise();
+        corners[4].rotateClockwise();
+        corners[5].rotateClockwise();
     }
 
     private void backCounterClockwise() {
@@ -107,6 +122,11 @@ public class Cube implements RubikCube {
         edges[2] = edges[4];
         edges[4] = edges[10];
         edges[10] = tempEdge;
+        // Update corner orientation.
+        corners[0].rotateCounterClockwise();
+        corners[1].rotateCounterClockwise();
+        corners[4].rotateCounterClockwise();
+        corners[5].rotateCounterClockwise();
     }
 
     private void upClockwise() {
@@ -122,6 +142,11 @@ public class Cube implements RubikCube {
         edges[3] = edges[1];
         edges[1] = edges[2];
         edges[2] = tempEdge;
+        // Flip edge orientation.
+        edges[0].flipOrientation();
+        edges[1].flipOrientation();
+        edges[2].flipOrientation();
+        edges[3].flipOrientation();
     }
 
     private void upCounterClockwise() {
@@ -137,6 +162,12 @@ public class Cube implements RubikCube {
         edges[2] = edges[1];
         edges[1] = edges[3];
         edges[3] = tempEdge;
+        // Flip edge orientation.
+        edges[0].flipOrientation();
+        edges[1].flipOrientation();
+        edges[2].flipOrientation();
+        edges[3].flipOrientation();
+
     }
 
     private void downClockwise() {
@@ -152,6 +183,11 @@ public class Cube implements RubikCube {
         edges[10] = edges[9];
         edges[9] = edges[11];
         edges[11] = tempEdge;
+        // Flip edge orientation.
+        edges[8].flipOrientation();
+        edges[9].flipOrientation();
+        edges[10].flipOrientation();
+        edges[11].flipOrientation();
     }
 
     private void downCounterClockwise() {
@@ -167,6 +203,11 @@ public class Cube implements RubikCube {
         edges[11] = edges[9];
         edges[9] = edges[10];
         edges[10] = tempEdge;
+        // Flip edge orientation.
+        edges[8].flipOrientation();
+        edges[9].flipOrientation();
+        edges[10].flipOrientation();
+        edges[11].flipOrientation();
     }
 
     private void leftClockwise() {
@@ -182,6 +223,11 @@ public class Cube implements RubikCube {
         edges[4] = edges[8];
         edges[8] = edges[6];
         edges[6] = tempEdge;
+        // Update corner orientation.
+        corners[0].rotateClockwise();
+        corners[2].rotateClockwise();
+        corners[4].rotateClockwise();
+        corners[6].rotateClockwise();
     }
 
     private void leftCounterClockwise() {
@@ -197,6 +243,11 @@ public class Cube implements RubikCube {
         edges[6] = edges[8];
         edges[8] = edges[4];
         edges[4] = tempEdge;
+        // Update corner orientation.
+        corners[0].rotateCounterClockwise();
+        corners[2].rotateCounterClockwise();
+        corners[4].rotateCounterClockwise();
+        corners[6].rotateCounterClockwise();
     }
 
     private void rightClockwise() {
@@ -212,6 +263,11 @@ public class Cube implements RubikCube {
         edges[7] = edges[9];
         edges[9] = edges[5];
         edges[5] = tempEdge;
+        // Update corner orientation.
+        corners[1].rotateClockwise();
+        corners[3].rotateClockwise();
+        corners[5].rotateClockwise();
+        corners[7].rotateClockwise();
     }
 
     private void rightCounterClockwise() {
@@ -227,38 +283,24 @@ public class Cube implements RubikCube {
         edges[5] = edges[9];
         edges[9] = edges[7];
         edges[7] = tempEdge;
+        // Update corner orientation.
+        corners[1].rotateCounterClockwise();
+        corners[3].rotateCounterClockwise();
+        corners[5].rotateCounterClockwise();
+        corners[7].rotateCounterClockwise();
     }
 
+    private String getUpFace() {
+        String upFace = "";
+        return upFace;
+    }
 
+    @Override
+    public void printCube() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("    ").append("-------- TOP --------\n");
 
-//    public RubikSide getFront() {
-//        return this.front;
-//    }
-//
-//    public RubikSide getBack() {
-//        return this.back;
-//    }
-//
-//    public RubikSide getLeft() {
-//        return this.left;
-//    }
-//
-//    public RubikSide getRight() {
-//        return this.right;
-//    }
-//
-//    public RubikSide getTop() {
-//        return this.top;
-//    }
-//
-//    public RubikSide getBottom() {
-//        return this.bottom;
-//    }
-//
-//    public int getSize() {
-//        return this.size;
-//    }
-
+    }
 
 //    // Print cube sides.
 //    public void printCube() {
@@ -310,7 +352,6 @@ public class Cube implements RubikCube {
 //    }
 
 
-
     @Override
     public void F_l() {
         frontCounterClockwise();
@@ -323,7 +364,7 @@ public class Cube implements RubikCube {
 
     @Override
     public void B_l() {
-       backCounterClockwise();
+        backCounterClockwise();
     }
 
     @Override
@@ -333,12 +374,12 @@ public class Cube implements RubikCube {
 
     @Override
     public void U_l() {
-       upCounterClockwise();
+        upCounterClockwise();
     }
 
     @Override
     public void U_r() {
-       upCounterClockwise();
+        upClockwise();
     }
 
     @Override
@@ -358,7 +399,7 @@ public class Cube implements RubikCube {
 
     @Override
     public void L_r() {
-       leftClockwise();
+        leftClockwise();
     }
 
     @Override
@@ -369,11 +410,6 @@ public class Cube implements RubikCube {
     @Override
     public void R_r() {
         rightClockwise();
-    }
-
-    @Override
-    public void printCube() {
-
     }
 
 }
