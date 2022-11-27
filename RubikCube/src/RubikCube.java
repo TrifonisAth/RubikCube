@@ -1,341 +1,379 @@
-import java.util.Arrays;
+public class RubikCube implements Cube {
 
-public class RubikCube  implements  CubeMovements{
-    private final RubikSide front;
-    private final RubikSide back;
-    private final RubikSide left;
-    private final RubikSide right;
-    private final RubikSide top;
-    private final RubikSide bottom;
-    private final int size;
-    private final byte[] squares = new byte[54];
-    private final Corner[] corners;
-    private final Edge[] edges;
+    private final Corner[] corners = new Corner[8];
+    private final Edge[] edges = new Edge[12];
+    private final char[] center = new char[6];
 
+    public RubikCube() {
+        this.initCube();
+    }
 
+    private void initCube(){
+        corners[0] = new Corner(new char[]{'U', 'L', 'B'});
+        corners[1] = new Corner(new char[]{'U', 'R', 'B'});
+        corners[2] = new Corner(new char[]{'U', 'L', 'F'});
+        corners[3] = new Corner(new char[]{'U', 'R', 'F'});
+        corners[4] = new Corner(new char[]{'D', 'L', 'B'});
+        corners[5] = new Corner(new char[]{'D', 'R', 'B'});
+        corners[6] = new Corner(new char[]{'D', 'L', 'F'});
+        corners[7] = new Corner(new char[]{'D', 'R', 'F'});
 
-    public RubikCube(int size) {
-        this.size = size;
-        this.front = new RubikSide(size, 1);
-        this.right = new RubikSide(size, 2);
-        this.back = new RubikSide(size, 3);
-        this.left = new RubikSide(size, 4);
-        this.top = new RubikSide(size, 5);
-        this.bottom = new RubikSide(size, 6);
-        for (byte i = 0; i < 6; i++) {
-            for (byte j = 0; j < 9; j++) {
-                this.squares[i * 9 + j] = i;
-            }
+        edges[0] = new Edge(new char[]{'U', 'L'});
+        edges[1] = new Edge(new char[]{'U', 'R'});
+        edges[2] = new Edge(new char[]{'U', 'B'});
+        edges[3] = new Edge(new char[]{'U', 'F'});
+        edges[4] = new Edge(new char[]{'L', 'B'});
+        edges[5] = new Edge(new char[]{'R', 'B'});
+        edges[6] = new Edge(new char[]{'L', 'F'});
+        edges[7] = new Edge(new char[]{'R', 'F'});
+        edges[8] = new Edge(new char[]{'D', 'L'});
+        edges[9] = new Edge(new char[]{'D', 'R'});
+        edges[10] = new Edge(new char[]{'D', 'B'});
+        edges[11] = new Edge(new char[]{'D', 'F'});
+
+        center[0] = 'F';
+        center[1] = 'R';
+        center[2] = 'B';
+        center[3] = 'L';
+        center[4] = 'U';
+        center[5] = 'D';
+    }
+
+    private RubikCube(RubikCube cube) {
+        for (int i = 0; i < 8; i++) {
+            corners[i] = new Corner(cube.corners[i]);
         }
-    }
-
-    public RubikSide getFront() {
-        return this.front;
-    }
-
-    public RubikSide getBack() {
-        return this.back;
-    }
-
-    public RubikSide getLeft() {
-        return this.left;
-    }
-
-    public RubikSide getRight() {
-        return this.right;
-    }
-
-    public RubikSide getTop() {
-        return this.top;
-    }
-
-    public RubikSide getBottom() {
-        return this.bottom;
-    }
-
-    public int getSize() {
-        return this.size;
-    }
-
-    // Turn selected row to the right if direction is 1, to the left if direction is -1.
-    public void turnRow(int row, int direction) {
-        int[] rowCopy = getFront().getRow(row);
-        // Right turn, anticlockwise rotation (Top view)
-        if (direction == -1) {
-            getFront().setRow(row, getLeft().getRow(row));
-            getLeft().setRow(row, getBack().getRow(row));
-            getBack().setRow(row, getRight().getRow(row));
-            getRight().setRow(row, rowCopy);
-            if (row == 0) {
-                getTop().rotateAnticlockwise();
-            } else if(row == getSize() - 1) {
-                getBottom().rotateClockwise();
-            }
-            // Left turn. Clockwise rotation (Top view)
-        } else if (direction == 1) {
-            getFront().setRow(row, getRight().getRow(row));
-            getRight().setRow(row, getBack().getRow(row));
-            getBack().setRow(row, getLeft().getRow(row));
-            getLeft().setRow(row, rowCopy);
-            if (row == 0) {
-                getTop().rotateClockwise();
-            } else if(row == getSize() - 1) {
-                getBottom().rotateAnticlockwise();
-            }
+        for (int i = 0; i < 12; i++) {
+            edges[i] = new Edge(cube.edges[i]);
         }
-        updateColumns(row);
+        System.arraycopy(cube.center, 0, center, 0, 6);
     }
 
-    public void updateRows(int col){
-        getFront().updateRow(col);
-        getBack().updateRow(size - (1 + col));
-        getTop().updateRow(col);
-        getBottom().updateRow(col);
+    private void frontClockwise() {
+        // Rotate corners.
+        Corner temp = corners[2];
+        corners[2] = corners[6];
+        corners[6] = corners[7];
+        corners[7] = corners[3];
+        corners[3] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[6];
+        edges[6] = edges[11];
+        edges[11] = edges[7];
+        edges[7] = edges[3];
+        edges[3] = tempEdge;
     }
 
-    public void updateColumns(int row){
-        getFront().updateColumn(row);
-        getBack().updateColumn(row);
-        getLeft().updateColumn(row);
-        getRight().updateColumn(row);
+    private void frontCounterClockwise() {
+        // Rotate corners.
+        Corner temp = corners[2];
+        corners[2] = corners[3];
+        corners[3] = corners[7];
+        corners[7] = corners[6];
+        corners[6] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[6];
+        edges[6] = edges[3];
+        edges[3] = edges[7];
+        edges[7] = edges[11];
+        edges[11] = tempEdge;
     }
 
-    // Print cube sides.
-    public void printCube() {
-        StringBuilder str = new StringBuilder();
-        str.append("      -------- TOP --------\n");
-        for (int i = 0; i < size; i++) {
-            str.append("\t".repeat(size/2 +1).concat("\t").concat(Arrays.toString(getTop().getRow(i))));
-            str.append("\n");
-        }
-        str.append("\n");
-        for (int i = 0; i < size; i++){
-            str.append(Arrays.toString(getLeft().getRow(i))).append("\t");
-            str.append(Arrays.toString(getFront().getRow(i))).append("\t");
-            str.append(Arrays.toString(getRight().getRow(i))).append("\t");
-            str.append(Arrays.toString(getBack().getRow(i)));
-            str.append("\n");
-        }
-        str.append("\n");
-        for (int i = 0; i < size; i++) {
-            str.append("\t".repeat(size/2 + 1).concat("\t").concat(Arrays.toString(getBottom().getRow(i))));
-            str.append("\n");
-        }
-        str.append("      ------ BOTTOM -------");
-        System.out.println(str);
+    private void backClockwise() {
+        // Rotate corners.
+        Corner temp = corners[0];
+        corners[0] = corners[1];
+        corners[1] = corners[5];
+        corners[5] = corners[4];
+        corners[4] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[5];
+        edges[5] = edges[10];
+        edges[10] = edges[4];
+        edges[4] = edges[2];
+        edges[2] = tempEdge;
     }
 
-    public void printCube2() {
-        StringBuilder str = new StringBuilder();
-        str.append("      -------- TOP --------\n");
-        for (int i = 0; i < size; i++) {
-            str.append("\t".repeat(size/2 +1).concat("\t").concat(String.valueOf(squares[36 + i * 3])).concat(String.valueOf(squares[36 + i * 3 + 1])).concat(String.valueOf(squares[36 + i * 3 + 2])));
-            str.append("\n");
-        }
-        str.append("\n");
-        for (int i = 0; i < size; i++){
-            str.append(squares[27 + i * 3]).append(squares[27 + i * 3 + 1]).append(squares[27 + i * 3 + 2]).append("\t");
-            str.append(squares[27 + i * 3]).append(squares[27 + i * 3 + 1]).append(squares[27 + i * 3 + 2]).append("\t");
-            str.append(squares[27 + i * 3]).append(squares[27 + i * 3 + 1]).append(squares[27 + i * 3 + 2]).append("\t");
-            str.append(Arrays.toString(getBack().getRow(i)));
-            str.append("\n");
-        }
-        str.append("\n");
-        for (int i = 0; i < size; i++) {
-            str.append("\t".repeat(size/2 + 1).concat("\t").concat(Arrays.toString(getBottom().getRow(i))));
-            str.append("\n");
-        }
-        str.append("      ------ BOTTOM -------");
-        System.out.println(str);
+    private void backCounterClockwise() {
+        // Rotate corners.
+        Corner temp = corners[0];
+        corners[0] = corners[4];
+        corners[4] = corners[5];
+        corners[5] = corners[1];
+        corners[1] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[5];
+        edges[5] = edges[2];
+        edges[2] = edges[4];
+        edges[4] = edges[10];
+        edges[10] = tempEdge;
+    }
+
+    private void upClockwise() {
+        // Rotate corners.
+        Corner temp = corners[0];
+        corners[0] = corners[2];
+        corners[2] = corners[3];
+        corners[3] = corners[1];
+        corners[1] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[0];
+        edges[0] = edges[3];
+        edges[3] = edges[1];
+        edges[1] = edges[2];
+        edges[2] = tempEdge;
+    }
+
+    private void upCounterClockwise() {
+        // Rotate corners.
+        Corner temp = corners[0];
+        corners[0] = corners[1];
+        corners[1] = corners[3];
+        corners[3] = corners[2];
+        corners[2] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[0];
+        edges[0] = edges[2];
+        edges[2] = edges[1];
+        edges[1] = edges[3];
+        edges[3] = tempEdge;
+    }
+
+    private void downClockwise() {
+        // Rotate corners.
+        Corner temp = corners[4];
+        corners[4] = corners[5];
+        corners[5] = corners[7];
+        corners[7] = corners[6];
+        corners[6] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[8];
+        edges[8] = edges[10];
+        edges[10] = edges[9];
+        edges[9] = edges[11];
+        edges[11] = tempEdge;
+    }
+
+    private void downCounterClockwise() {
+        // Rotate corners.
+        Corner temp = corners[4];
+        corners[4] = corners[6];
+        corners[6] = corners[7];
+        corners[7] = corners[5];
+        corners[5] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[8];
+        edges[8] = edges[11];
+        edges[11] = edges[9];
+        edges[9] = edges[10];
+        edges[10] = tempEdge;
+    }
+
+    private void leftClockwise() {
+        // Rotate corners.
+        Corner temp = corners[0];
+        corners[0] = corners[4];
+        corners[4] = corners[6];
+        corners[6] = corners[2];
+        corners[2] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[0];
+        edges[0] = edges[4];
+        edges[4] = edges[8];
+        edges[8] = edges[6];
+        edges[6] = tempEdge;
+    }
+
+    private void leftCounterClockwise() {
+        // Rotate corners.
+        Corner temp = corners[0];
+        corners[0] = corners[2];
+        corners[2] = corners[6];
+        corners[6] = corners[4];
+        corners[4] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[0];
+        edges[0] = edges[6];
+        edges[6] = edges[8];
+        edges[8] = edges[4];
+        edges[4] = tempEdge;
+    }
+
+    private void rightClockwise() {
+        // Rotate corners.
+        Corner temp = corners[1];
+        corners[1] = corners[3];
+        corners[3] = corners[7];
+        corners[7] = corners[5];
+        corners[5] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[1];
+        edges[1] = edges[7];
+        edges[7] = edges[9];
+        edges[9] = edges[5];
+        edges[5] = tempEdge;
+    }
+
+    private void rightCounterClockwise() {
+        // Rotate corners.
+        Corner temp = corners[1];
+        corners[1] = corners[5];
+        corners[5] = corners[7];
+        corners[7] = corners[3];
+        corners[3] = temp;
+        // Rotate edges.
+        Edge tempEdge = edges[1];
+        edges[1] = edges[5];
+        edges[5] = edges[9];
+        edges[9] = edges[7];
+        edges[7] = tempEdge;
     }
 
 
 
+//    public RubikSide getFront() {
+//        return this.front;
+//    }
+//
+//    public RubikSide getBack() {
+//        return this.back;
+//    }
+//
+//    public RubikSide getLeft() {
+//        return this.left;
+//    }
+//
+//    public RubikSide getRight() {
+//        return this.right;
+//    }
+//
+//    public RubikSide getTop() {
+//        return this.top;
+//    }
+//
+//    public RubikSide getBottom() {
+//        return this.bottom;
+//    }
+//
+//    public int getSize() {
+//        return this.size;
+//    }
 
-    public void turnCol(int col, int direction) {
-        int[] colCopy = getFront().getColumn(col);
-        // Turn up.
-        if (direction == 1){
-            getFront().setColumn(col, getBottom().getColumn(col));
-            getBottom().setColumn(col, reversed(getBack().getColumn(size - (col + 1))));
-            getBack().setColumn(size - (col + 1), reversed(getTop().getColumn(col)));
-            getTop().setColumn(col, colCopy);
-            if (col == 0) {
-                getLeft().rotateAnticlockwise();
-            } else if (col == getSize() - 1) {
-                getRight().rotateClockwise();
-            }
-            // Turn down.
-        } else if (direction == -1){
-            getFront().setColumn(col, getTop().getColumn(col));
-            getTop().setColumn(col, reversed(getBack().getColumn(size - (col + 1))));
-            getBack().setColumn(size - (col + 1),  reversed(getBottom().getColumn(col)));
-            getBottom().setColumn(col, colCopy);
 
-           if (col == 0) {
-               getLeft().rotateClockwise();
-           } else if (col == getSize() - 1) {
-               getRight().rotateAnticlockwise();
-           }
-        }
-        updateRows(col);
-    }
+//    // Print cube sides.
+//    public void printCube() {
+//        StringBuilder str = new StringBuilder();
+//        str.append("      -------- TOP --------\n");
+//        for (int i = 0; i < size; i++) {
+//            str.append("\t".repeat(size / 2 + 1).concat("\t").concat(Arrays.toString(getTop().getRow(i))));
+//            str.append("\n");
+//        }
+//        str.append("\n");
+//        for (int i = 0; i < size; i++) {
+//            str.append(Arrays.toString(getLeft().getRow(i))).append("\t");
+//            str.append(Arrays.toString(getFront().getRow(i))).append("\t");
+//            str.append(Arrays.toString(getRight().getRow(i))).append("\t");
+//            str.append(Arrays.toString(getBack().getRow(i)));
+//            str.append("\n");
+//        }
+//        str.append("\n");
+//        for (int i = 0; i < size; i++) {
+//            str.append("\t".repeat(size / 2 + 1).concat("\t").concat(Arrays.toString(getBottom().getRow(i))));
+//            str.append("\n");
+//        }
+//        str.append("      ------ BOTTOM -------");
+//        System.out.println(str);
+//    }
+//
+//    public void printCube2() {
+//        StringBuilder str = new StringBuilder();
+//        str.append("      -------- TOP --------\n");
+//        for (int i = 0; i < size; i++) {
+//            str.append("\t".repeat(size / 2 + 1).concat("\t").concat(String.valueOf(squares[36 + i * 3])).concat(String.valueOf(squares[36 + i * 3 + 1])).concat(String.valueOf(squares[36 + i * 3 + 2])));
+//            str.append("\n");
+//        }
+//        str.append("\n");
+//        for (int i = 0; i < size; i++) {
+//            str.append(squares[27 + i * 3]).append(squares[27 + i * 3 + 1]).append(squares[27 + i * 3 + 2]).append("\t");
+//            str.append(squares[27 + i * 3]).append(squares[27 + i * 3 + 1]).append(squares[27 + i * 3 + 2]).append("\t");
+//            str.append(squares[27 + i * 3]).append(squares[27 + i * 3 + 1]).append(squares[27 + i * 3 + 2]).append("\t");
+//            str.append(Arrays.toString(getBack().getRow(i)));
+//            str.append("\n");
+//        }
+//        str.append("\n");
+//        for (int i = 0; i < size; i++) {
+//            str.append("\t".repeat(size / 2 + 1).concat("\t").concat(Arrays.toString(getBottom().getRow(i))));
+//            str.append("\n");
+//        }
+//        str.append("      ------ BOTTOM -------");
+//        System.out.println(str);
+//    }
 
-    public int[] reversed(int[] array) {
-        int[] reversedArray = new int[array.length];
-        for (int i = 0; i < array.length; i++) {
-            reversedArray[i] = array[array.length - (i + 1)];
-        }
-        return reversedArray;
-    }
 
-    public void rotateBackSide(int direction){
-        int[] leftCol = getLeft().getColumn(0);
-        if (direction == -1){
-            // Rotate back side anti-clockwise.
-            getBack().rotateAnticlockwise();
-            getLeft().setColumn(0, getBottom().getRow(getSize() - 1));
-            getBottom().setRow(getSize() - 1, reversed(getRight().getColumn(getSize() - 1)));
-            getRight().setColumn(getSize() - 1, getTop().getRow(0));
-            getTop().setRow(0, reversed(leftCol));
-        } else if (direction == 1){
-            // Rotate back side clockwise.
-            getBack().rotateClockwise();
-            getLeft().setColumn(0, reversed(getTop().getRow(0)));
-            getTop().setRow(0, getRight().getColumn(getSize() - 1));
-            getRight().setColumn(getSize() - 1, reversed(getBottom().getRow(getSize() - 1)));
-            getBottom().setRow(getSize() - 1, leftCol);
-        }
-        // Update rows and columns.
-        getLeft().updateRow(0);
-        getBottom().updateColumn(getSize() - 1);
-        getRight().updateRow(getSize() - 1);
-        getTop().updateColumn(0);
-    }
-
-    public void rotateMid(int direction){
-        int[] leftCol = getLeft().getColumn(1);
-        if (direction == -1){
-            // Rotate mid anti-clockwise.
-            getLeft().setColumn(1, getBottom().getRow(1));
-            getBottom().setRow(1, reversed(getRight().getColumn(1)));
-            getRight().setColumn(1, getTop().getRow(1));
-            getTop().setRow(1, reversed(leftCol));
-        } else if (direction == 1){
-            // Rotate mid clockwise.
-            getLeft().setColumn(1, reversed(getTop().getRow(1)));
-            getTop().setRow(1, getRight().getColumn(1));
-            getRight().setColumn(1, reversed(getBottom().getRow(1)));
-            getBottom().setRow(1, leftCol);
-        }
-        // Update rows and columns.
-        getLeft().updateRow(1);
-        getBottom().updateColumn(1);
-        getRight().updateRow(1);
-        getTop().updateColumn(1);
-    }
-
-    public  void rotateFrontSide(int direction){
-        int[] leftCol = getLeft().getColumn(getSize() - 1);
-        if (direction == -1){
-            // Rotate front side anti-clockwise.
-            getFront().rotateAnticlockwise();
-            getLeft().setColumn(getSize() - 1, reversed(getTop().getRow(2)));
-            getTop().setRow(2, getRight().getColumn(0));
-            getRight().setColumn(0, reversed(getBottom().getRow(0)));
-            getBottom().setRow(0, leftCol);
-        } else if (direction == 1){
-            // Rotate front side clockwise.
-            getFront().rotateClockwise();
-            getLeft().setColumn(getSize() - 1, getBottom().getRow(0));
-            getBottom().setRow(0, reversed(getRight().getColumn(0)));
-            getRight().setColumn(0, getTop().getRow(2));
-            getTop().setRow(2, reversed(leftCol));
-        }
-        // Update rows and columns.
-        getLeft().updateRow(getSize() - 1);
-        getBottom().updateColumn(0);
-        getRight().updateRow(0);
-        getTop().updateColumn(getSize() - 1);
-    }
 
     @Override
     public void F_l() {
-        rotateFrontSide(-1);
+        frontCounterClockwise();
     }
 
     @Override
     public void F_r() {
-        rotateFrontSide(1);
+        frontClockwise();
     }
 
     @Override
     public void B_l() {
-        rotateBackSide(-1);
+       backCounterClockwise();
     }
 
     @Override
     public void B_r() {
-        rotateBackSide(1);
+        backClockwise();
     }
 
     @Override
     public void U_l() {
-        turnRow(0, -1);
+       upCounterClockwise();
     }
 
     @Override
     public void U_r() {
-        turnRow(0, 1);
+       upCounterClockwise();
     }
 
     @Override
     public void D_l() {
-        turnRow(getSize() - 1, 1);
+        downCounterClockwise();
     }
 
     @Override
     public void D_r() {
-        turnRow(getSize() - 1, -1);
+        downClockwise();
     }
 
     @Override
     public void L_l() {
-        turnCol(0, 1);
+        leftCounterClockwise();
     }
 
     @Override
     public void L_r() {
-        turnCol(0, -1);
+       leftClockwise();
     }
 
     @Override
     public void R_l() {
-        turnCol(getSize() - 1, -1);
+        rightCounterClockwise();
     }
 
     @Override
     public void R_r() {
-        turnCol(getSize() - 1, 1);
+        rightClockwise();
     }
 
     @Override
-    public void V_u() {
-        turnCol(1, 1);
+    public void printCube() {
+
     }
 
-    @Override
-    public void V_d() {
-        turnCol(1, -1);
-    }
-
-    @Override
-    public void H_l() {
-        turnRow(1, -1);
-    }
-
-    @Override
-    public void H_r() {
-        turnRow(1, 1);
-    }
 }

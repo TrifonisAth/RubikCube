@@ -1,4 +1,5 @@
-public interface CubeMovements {
+public interface Cube {
+
     // Rotate the front face of the cube anticlockwise.
     public void F_l();
 
@@ -35,12 +36,6 @@ public interface CubeMovements {
     // Rotate the right face of the cube clockwise.
     public void R_r();
 
-    // Rotate the vertical slice of the cube up.
-    public void V_u();
-    // Rotate the vertical slice layer of the cube down
-    public void V_d();
-    // Rotate the horizontal of the cube anticlockwise.
-    public void H_l();
-    // Rotate the horizontal of the cube clockwise.
-    public void H_r();
+    // Print the cube to the console.
+    public void printCube();
 }
