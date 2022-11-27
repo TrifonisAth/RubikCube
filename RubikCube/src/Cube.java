@@ -9,15 +9,16 @@ public class Cube implements RubikCube {
     }
 
     private void initCube() {
-        corners[0] = new Corner(new char[]{'U', 'L', 'B'}, 0);
-        corners[1] = new Corner(new char[]{'U', 'R', 'B'}, 1);
-        corners[2] = new Corner(new char[]{'U', 'L', 'F'}, 2);
-        corners[3] = new Corner(new char[]{'U', 'R', 'F'}, 3);
-        corners[4] = new Corner(new char[]{'D', 'L', 'B'}, 4);
-        corners[5] = new Corner(new char[]{'D', 'R', 'B'}, 5);
-        corners[6] = new Corner(new char[]{'D', 'L', 'F'}, 6);
-        corners[7] = new Corner(new char[]{'D', 'R', 'F'}, 7);
-
+        // Initialize corners.
+        corners[0] = new Corner(new char[]{'B', 'U', 'L'}, 0);
+        corners[1] = new Corner(new char[]{'R', 'U', 'B'}, 1);
+        corners[2] = new Corner(new char[]{'L', 'U', 'F'}, 2);
+        corners[3] = new Corner(new char[]{'F', 'U', 'R'}, 3);
+        corners[4] = new Corner(new char[]{'L', 'D',  'B'}, 4);
+        corners[5] = new Corner(new char[]{'B', 'D', 'R'}, 5);
+        corners[6] = new Corner(new char[]{'L', 'D', 'F'}, 6);
+        corners[7] = new Corner(new char[]{'F', 'D', 'R'}, 7);
+        // Initialize edges.
         edges[0] = new Edge(new char[]{'U', 'L'}, 0);
         edges[1] = new Edge(new char[]{'U', 'R'}, 1);
         edges[2] = new Edge(new char[]{'U', 'B'}, 2);
@@ -30,13 +31,37 @@ public class Cube implements RubikCube {
         edges[9] = new Edge(new char[]{'D', 'R'}, 9);
         edges[10] = new Edge(new char[]{'D', 'B'}, 10);
         edges[11] = new Edge(new char[]{'D', 'F'}, 11);
-
+        // Initialize center.
         center[0] = 'F';
         center[1] = 'R';
         center[2] = 'B';
         center[3] = 'L';
         center[4] = 'U';
         center[5] = 'D';
+    }
+
+    private String getTop(){
+        StringBuilder top = new StringBuilder();
+        char arr[] = new char[10];
+        for (int i = 0; i < 4; i++) {
+            if (corners[i].getOrientation() == 0) arr[i] = corners[i].getTiles()[1];
+            else if (corners[i].getOrientation() == 1) arr[i] = corners[i].getTiles()[0];
+            else arr[i] = corners[i].getTiles()[2];
+        }
+        for (int i = 0; i < 4; i++) {
+            if (edges[i].getOrientation()) arr[i + 4] = edges[i].getTiles()[0];
+            else arr[i + 4] = edges[i].getTiles()[1];
+        }
+        arr[9] = center[4];
+    }
+
+    public String getFront(){
+        char arr[] = new char[10];
+        for (int i = 0; i < 4; i++) {
+            if (corners[i].getOrientation() == 0) arr[i] = corners[i].getTiles()[2];
+            else if (corners[i].getOrientation() == 1) arr[i] = corners[i].getTiles()[1];
+            else arr[i] = corners[i].getTiles()[0];
+        }
     }
 
     private Cube(Cube cube) {
@@ -298,7 +323,8 @@ public class Cube implements RubikCube {
     @Override
     public void printCube() {
         StringBuilder sb = new StringBuilder();
-        sb.append("    ").append("-------- TOP --------\n");
+        sb.append("    ").append("-------- UP --------\n");
+
 
     }
 

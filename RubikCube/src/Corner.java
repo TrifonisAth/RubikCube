@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class Corner {
     private char[] tiles;
     private int orientation;
@@ -29,6 +31,11 @@ public class Corner {
 
     public void rotateCounterClockwise() {
         this.orientation = (this.orientation + 2) % 3;
+    }
+
+    @Override
+    public String toString() {
+        return
     }
 
 }
