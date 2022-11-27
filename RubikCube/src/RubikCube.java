@@ -283,23 +283,4 @@ public class RubikCube  implements  CubeMovements{
         turnCol(getSize() - 1, 1);
     }
 
-    @Override
-    public void V_u() {
-        turnCol(1, 1);
-    }
-
-    @Override
-    public void V_d() {
-        turnCol(1, -1);
-    }
-
-    @Override
-    public void H_l() {
-        turnRow(1, -1);
-    }
-
-    @Override
-    public void H_r() {
-        turnRow(1, 1);
-    }
 }
