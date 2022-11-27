@@ -8,6 +8,7 @@ public class Cube implements RubikCube {
         this.initCube();
     }
 
+    // Initialize the cube.
     private void initCube() {
         // Initialize corners.
         corners[0] = new Corner(new char[]{'B', 'U', 'L'}, 0);
