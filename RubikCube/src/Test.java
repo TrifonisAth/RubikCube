@@ -2,10 +2,10 @@ public class Test {
     private int testCount;
     private int testPassed;
     private int testFailed;
-    private RubikCube cube;
+    private Cube cube;
 
         public void init(int size) {
-            this.cube = new RubikCube(size);
+            this.cube = new Cube(size);
 
         }
 
