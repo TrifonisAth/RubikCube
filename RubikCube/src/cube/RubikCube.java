@@ -41,5 +41,8 @@ public interface RubikCube {
     public void printCube();
 
     // Check if the cube is solved.
-    public abstract boolean isSolved();
+    public  boolean isSolved();
+
+    // Check if K faces are solved.
+    public boolean isKSolved();
 }

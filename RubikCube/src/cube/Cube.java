@@ -1,13 +1,21 @@
 package cube;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Cube implements RubikCube {
+public class Cube implements RubikCube, Comparable<Cube> {
 
     // The cube is represented as a 3x3x3 array of integers.
     // Each integer represents a color.
-    private final int[][][] tiles;
+    private int[][][] tiles;
+    // Heuristic score.
+    private int score;
+    // Number of correct faces needed to solve the cube.
+    private int K = 6;
+    // The parent state.
+    private Cube parent = null;
     // Map with the faces of the cube from 1 to 6.
     private static final Map<Integer, String> faces = new HashMap<>();
     // Solved cube.
@@ -30,7 +38,7 @@ public class Cube implements RubikCube {
     }
 
 
-    public Cube() {
+    public Cube(int num) {
         // Initialize the cube to a solved state.
         tiles = new int[6][3][3];
         for (int i = 0; i < 6; i++) {
@@ -40,21 +48,28 @@ public class Cube implements RubikCube {
                 }
             }
         }
+        // Set the number of correct faces needed to solve the cube.
+        this.K = num;
+    }
+
+    public Cube(){
+        this(6);
     }
 
     // Copy constructor.
-    public Cube(Cube cube) {
-        tiles = new int[6][3][3];
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 3; j++) {
-                System.arraycopy(cube.tiles[i][j], 0, tiles[i][j], 0, 3);
-            }
-        }
+    public Cube(int[][][] tiles) {
+        this.setTiles(tiles);
+    }
+
+    @Override
+    public int compareTo(Cube s) {
+        return Double.compare(this.score, s.score); // compare based on the heuristic score.
     }
 
     // Check if the cube is solved.
     @Override
     public boolean isSolved() {
+        if (this.K < 6) return isKSolved();
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 3; j++) {
                 for (int k = 0; k < 3; k++) {
@@ -67,8 +82,151 @@ public class Cube implements RubikCube {
         return true;
     }
 
+    // Check if K faces are correct.
+    @Override
+    public boolean isKSolved() {
+        boolean[] checked = new boolean[6];
+        Arrays.fill(checked, true);
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (checked[i]) {
+                    for (int k = 0; k < 3; k++) {
+                        if (checked[i] && tiles[i][j][k] != solved[i][j][k]) {
+                            checked[i] = false;
+                            break;
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        int count = 0;
+        for (int i = 0; i < 6; i++) {
+            if (checked[i]) {
+                count++;
+            }
+        }
+        return count >= K;
+    }
 
-    // cube.Cube rotation methods.
+    public Cube getParent() {
+        return parent;
+    }
+
+    void setParent(Cube parent) {
+        this.parent = parent;
+    }
+
+    int getScore() {
+        return score;
+    }
+
+    void setScore(int score) {
+        this.score = score;
+    }
+
+    int[][][] getTiles() {
+        return this.tiles;
+    }
+
+    void setTiles(int[][][] tiles) {
+        this.tiles = tiles;
+    }
+
+    public ArrayList<Cube> getChildren() {
+        ArrayList<Cube> children = new ArrayList<>();
+        // Create a copy of the current cube.
+        Cube child = new Cube(this.getTiles());
+        // Rotate the faces of the cube evaluate the distance, set the parent and add the child to the list.
+        child.F_r();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.F_l();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.R_r();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.R_l();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.B_r();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.B_l();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.L_r();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.L_l();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.U_r();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.U_l();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.D_r();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+        child = new Cube(this.getTiles());
+        child.D_l();
+        child.countDistance();
+        child.setParent(this);
+        children.add(child);
+
+        return children;
+    }
+
+    // Calculate distance for every move that the tile needs to get to the correct place.
+    private void countDistance() {
+        // TODO: maybe divide the distance by 4...
+        int distance = 0;
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 3; j++) {
+                for (int k = 0; k < 3; k++) {
+                    // Skip the center tile.
+                    if (j==1 && k==1) continue;
+                    int tileA = tiles[i][j][k];
+                    int tileB = solved[i][j][k];
+                    if (tileA != tileB) {
+                        if (tileA == 1 && tileB == 3 || tileA == 3 && tileB == 1 || tileA == 2 && tileB == 4 || tileA == 4 && tileB == 2
+                                || tileA == 5 && tileB == 6 || tileA == 6 && tileB == 5) {
+                            distance += 2;
+                        } else ++distance;
+                    }
+                }
+            }
+        }
+        this.setScore(distance);
+    }
+
+
+    // Cube rotation methods.
 
     // Rotate the front face clockwise.
     private void rotateFrontClockwise() {
@@ -557,9 +715,9 @@ public class Cube implements RubikCube {
         StringBuilder sb = new StringBuilder();
         sb.append("---------------------\n");
         sb.append("\t\t Top\n");
-       sb.append("\t\t");
-       sb.append(tiles[4][0][0]).append(" ").append(tiles[4][0][1]).append(" ").append(tiles[4][0][2]).append("\n");
-         sb.append("\t\t");
+        sb.append("\t\t");
+        sb.append(tiles[4][0][0]).append(" ").append(tiles[4][0][1]).append(" ").append(tiles[4][0][2]).append("\n");
+        sb.append("\t\t");
         sb.append(tiles[4][1][0]).append(" ").append(tiles[4][1][1]).append(" ").append(tiles[4][1][2]).append("\n");
         sb.append("Left\t").append(tiles[4][2][0]).append(" ").append(tiles[4][2][1]).append(" ").append(tiles[4][2][2]).append("\t").append("Right\tBack\n");
         sb.append(tiles[3][0][0]).append(" ").append(tiles[3][0][1]).append(" ").append(tiles[3][0][2]).append("\t");
