@@ -1,9 +1,6 @@
 package cube;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Cube implements RubikCube, Comparable<Cube> {
 
@@ -61,6 +58,11 @@ public class Cube implements RubikCube, Comparable<Cube> {
         this.setTiles(tiles);
     }
 
+    public Cube(int[][][] tiles, int counter) {
+        this.setTiles(tiles);
+        this.score = counter;
+    }
+
     @Override
     public int compareTo(Cube s) {
         return Double.compare(this.score, s.score); // compare based on the heuristic score.
@@ -111,7 +113,7 @@ public class Cube implements RubikCube, Comparable<Cube> {
     }
 
     public Cube getParent() {
-        return parent;
+        return this.parent;
     }
 
     void setParent(Cube parent) {
@@ -134,66 +136,66 @@ public class Cube implements RubikCube, Comparable<Cube> {
         this.tiles = tiles;
     }
 
-    public ArrayList<Cube> getChildren() {
+    public ArrayList<Cube> getChildren(int counter) {
         ArrayList<Cube> children = new ArrayList<>();
         // Create a copy of the current cube.
-        Cube child = new Cube(this.getTiles());
+        Cube child = new Cube(this.getTiles(), counter);
         // Rotate the faces of the cube evaluate the distance, set the parent and add the child to the list.
         child.F_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.F_l();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.R_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.R_l();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.B_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.B_l();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.L_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.L_l();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.U_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.U_l();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.D_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles());
+        child = new Cube(this.getTiles(), counter);
         child.D_l();
         child.countDistance();
         child.setParent(this);
@@ -214,17 +216,44 @@ public class Cube implements RubikCube, Comparable<Cube> {
                     int tileA = tiles[i][j][k];
                     int tileB = solved[i][j][k];
                     if (tileA != tileB) {
-                        if (tileA == 1 && tileB == 3 || tileA == 3 && tileB == 1 || tileA == 2 && tileB == 4 || tileA == 4 && tileB == 2
-                                || tileA == 5 && tileB == 6 || tileA == 6 && tileB == 5) {
+                        if ((tileA == 1 && tileB == 3) || (tileA == 3 && tileB == 1) || (tileA == 2 && tileB == 4) || (tileA == 4 && tileB == 2)
+                                || (tileA == 5 && tileB == 6) || (tileA == 6 && tileB == 5)) {
                             distance += 2;
                         } else ++distance;
                     }
                 }
             }
         }
-        this.setScore(distance);
+        distance = distance / 20;
+        this.updateScore(distance);
     }
 
+    private void updateScore(int number) {
+        this.score += number;
+    }
+
+    // Generate a random cube.
+    public void randomize() {
+        Random random = new Random();
+        int n = random.nextInt(4, 8);
+        for (int i = 0; i < n; i++) {
+            int m = random.nextInt(12);
+            switch (m) {
+                case 0 -> F_r();
+                case 1 -> F_l();
+                case 2 -> R_r();
+                case 3 -> R_l();
+                case 4 -> B_r();
+                case 5 -> B_l();
+                case 6 -> L_r();
+                case 7 -> L_l();
+                case 8 -> U_r();
+                case 9 -> U_l();
+                case 10 -> D_r();
+                case 11 -> D_l();
+            }
+        }
+    }
 
     // Cube rotation methods.
 

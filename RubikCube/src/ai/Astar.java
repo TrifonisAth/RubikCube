@@ -7,16 +7,17 @@ import java.util.Collections;
 import java.util.HashSet;
 
 public class Astar {
-    private  ArrayList<Cube> frontier;
+    private final ArrayList<Cube> frontier;
     private final HashSet<Cube> closedSet;
 
-    Astar(){
+    public Astar(){
          this.frontier = new ArrayList<>();
         this.closedSet = new HashSet<>();
     }
 
     // A* algorithm with closed set.
-    Cube AstarClosedSet(Cube initialState){
+    public Cube AstarClosedSet(Cube initialState){
+        int counter = 0;
         if(initialState.isSolved()) return initialState;
         // step 1: put initial state in the frontier.
         this.frontier.add(initialState);
@@ -32,8 +33,9 @@ public class Astar {
             // else go to step 2.
             if(!this.closedSet.contains(currentState))
             {
+                ++counter;
                 this.closedSet.add(currentState);
-                this.frontier.addAll(currentState.getChildren());
+                this.frontier.addAll(currentState.getChildren(counter));
                 // step 6: sort the frontier based on the heuristic score to get best as first
                 Collections.sort(this.frontier); // sort the frontier to get best as first
             }
