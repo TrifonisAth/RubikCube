@@ -1,3 +1,5 @@
+package cube;
+
 public interface RubikCube {
     // Rotate the front face of the cube anticlockwise.
     public void F_l();
@@ -37,4 +39,7 @@ public interface RubikCube {
 
     // Print the cube to the console.
     public void printCube();
+
+    // Check if the cube is solved.
+    public abstract boolean isSolved();
 }

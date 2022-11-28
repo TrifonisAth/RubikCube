@@ -1,3 +1,5 @@
+package cube;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +10,15 @@ public class Cube implements RubikCube {
     private final int[][][] tiles;
     // Map with the faces of the cube from 1 to 6.
     private static final Map<Integer, String> faces = new HashMap<>();
+    // Solved cube.
+    private static final int[][][] solved = {
+            {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}},
+            {{2, 2, 2}, {2, 2, 2}, {2, 2, 2}},
+            {{3, 3, 3}, {3, 3, 3}, {3, 3, 3}},
+            {{4, 4, 4}, {4, 4, 4}, {4, 4, 4}},
+            {{5, 5, 5}, {5, 5, 5}, {5, 5, 5}},
+            {{6, 6, 6}, {6, 6, 6}, {6, 6, 6}}
+    };
 
     static {
         faces.put(1, "Front");
@@ -41,8 +52,23 @@ public class Cube implements RubikCube {
         }
     }
 
+    // Check if the cube is solved.
+    @Override
+    public boolean isSolved() {
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 3; j++) {
+                for (int k = 0; k < 3; k++) {
+                    if (tiles[i][j][k] != solved[i][j][k]) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
-    // Cube rotation methods.
+
+    // cube.Cube rotation methods.
 
     // Rotate the front face clockwise.
     private void rotateFrontClockwise() {
@@ -525,8 +551,8 @@ public class Cube implements RubikCube {
         rotateRightClockwise();
     }
 
-    @Override
     // Print the cube in a human-readable format, with every face in relative position to each other.
+    @Override
     public void printCube() {
         StringBuilder sb = new StringBuilder();
         sb.append("---------------------\n");
@@ -556,9 +582,6 @@ public class Cube implements RubikCube {
         sb.append(tiles[5][2][0]).append(" ").append(tiles[5][2][1]).append(" ").append(tiles[5][2][2]).append("\n");
         sb.append("\t\tBottom\n");
         sb.append("---------------------\n");
-
-
         System.out.println(sb);
-
     }
 }
