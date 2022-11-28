@@ -8,7 +8,7 @@ public  class Main {
         public   static   void  main(String[] args) {
             Cube initialState =  new  Cube(1);
             initialState.randomize();
-            initialState.printCube();
+            initialState.countDistance();
             Astar astar =  new  Astar();
             long start = System.currentTimeMillis();
             Cube terminalState = astar.AstarClosedSet(initialState);

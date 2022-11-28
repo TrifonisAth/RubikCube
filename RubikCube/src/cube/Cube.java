@@ -10,7 +10,7 @@ public class Cube implements RubikCube, Comparable<Cube> {
     // Heuristic score.
     private int score;
     // Number of correct faces needed to solve the cube.
-    private int K = 6;
+    private int K;
     // The parent state.
     private Cube parent = null;
     // Map with the faces of the cube from 1 to 6.
@@ -37,11 +37,11 @@ public class Cube implements RubikCube, Comparable<Cube> {
 
     public Cube(int num) {
         // Initialize the cube to a solved state.
-        tiles = new int[6][3][3];
+        this.tiles = new int[6][3][3];
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 3; j++) {
                 for (int k = 0; k < 3; k++) {
-                    tiles[i][j][k] = i + 1;
+                    this.tiles[i][j][k] = i + 1;
                 }
             }
         }
@@ -58,9 +58,10 @@ public class Cube implements RubikCube, Comparable<Cube> {
         this.setTiles(tiles);
     }
 
-    public Cube(int[][][] tiles, int counter) {
+    public Cube(int[][][] tiles, int counter, int k) {
         this.setTiles(tiles);
         this.score = counter;
+        this.K = k;
     }
 
     @Override
@@ -93,7 +94,7 @@ public class Cube implements RubikCube, Comparable<Cube> {
             for (int j = 0; j < 3; j++) {
                 if (checked[i]) {
                     for (int k = 0; k < 3; k++) {
-                        if (checked[i] && tiles[i][j][k] != solved[i][j][k]) {
+                        if (checked[i] && this.tiles[i][j][k] != solved[i][j][k]) {
                             checked[i] = false;
                             break;
                         }
@@ -133,69 +134,74 @@ public class Cube implements RubikCube, Comparable<Cube> {
     }
 
     void setTiles(int[][][] tiles) {
-        this.tiles = tiles;
+        this.tiles = new int[6][3][3];
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.arraycopy(tiles[i][j], 0, this.tiles[i][j], 0, 3);
+            }
+        }
     }
 
     public ArrayList<Cube> getChildren(int counter) {
         ArrayList<Cube> children = new ArrayList<>();
         // Create a copy of the current cube.
-        Cube child = new Cube(this.getTiles(), counter);
+        Cube child = new Cube(this.getTiles(), counter, this.K);
         // Rotate the faces of the cube evaluate the distance, set the parent and add the child to the list.
         child.F_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.F_l();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.R_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.R_l();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.B_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.B_l();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.L_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.L_l();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.U_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.U_l();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.D_r();
         child.countDistance();
         child.setParent(this);
         children.add(child);
-        child = new Cube(this.getTiles(), counter);
+        child = new Cube(this.getTiles(), counter, this.K);
         child.D_l();
         child.countDistance();
         child.setParent(this);
@@ -205,7 +211,7 @@ public class Cube implements RubikCube, Comparable<Cube> {
     }
 
     // Calculate distance for every move that the tile needs to get to the correct place.
-    private void countDistance() {
+    public void countDistance() {
         // TODO: maybe divide the distance by 4...
         int distance = 0;
         for (int i = 0; i < 6; i++) {
@@ -213,7 +219,7 @@ public class Cube implements RubikCube, Comparable<Cube> {
                 for (int k = 0; k < 3; k++) {
                     // Skip the center tile.
                     if (j==1 && k==1) continue;
-                    int tileA = tiles[i][j][k];
+                    int tileA = this.tiles[i][j][k];
                     int tileB = solved[i][j][k];
                     if (tileA != tileB) {
                         if ((tileA == 1 && tileB == 3) || (tileA == 3 && tileB == 1) || (tileA == 2 && tileB == 4) || (tileA == 4 && tileB == 2)
@@ -224,9 +230,10 @@ public class Cube implements RubikCube, Comparable<Cube> {
                 }
             }
         }
-        distance = distance / 20;
         this.updateScore(distance);
     }
+
+
 
     private void updateScore(int number) {
         this.score += number;
@@ -235,7 +242,7 @@ public class Cube implements RubikCube, Comparable<Cube> {
     // Generate a random cube.
     public void randomize() {
         Random random = new Random();
-        int n = random.nextInt(4, 8);
+        int n = random.nextInt(15, 30);
         for (int i = 0; i < n; i++) {
             int m = random.nextInt(12);
             switch (m) {
@@ -261,175 +268,175 @@ public class Cube implements RubikCube, Comparable<Cube> {
     private void rotateFrontClockwise() {
         // Rotate the front face.
         // Front face corner tiles.
-        int temp = tiles[0][0][0];
-        tiles[0][0][0] = tiles[0][2][0];
-        tiles[0][2][0] = tiles[0][2][2];
-        tiles[0][2][2] = tiles[0][0][2];
-        tiles[0][0][2] = temp;
-        // Front face edge tiles.
-        temp = tiles[0][0][1];
-        tiles[0][0][1] = tiles[0][1][0];
-        tiles[0][1][0] = tiles[0][2][1];
-        tiles[0][2][1] = tiles[0][1][2];
-        tiles[0][1][2] = temp;
+        int temp = this.tiles[0][0][0];
+        this.tiles[0][0][0] = this.tiles[0][2][0];
+        this.tiles[0][2][0] = this.tiles[0][2][2];
+        this.tiles[0][2][2] = this.tiles[0][0][2];
+        this.tiles[0][0][2] = temp;
+        // Front face edge this.tiles.
+        temp = this.tiles[0][0][1];
+        this.tiles[0][0][1] = this.tiles[0][1][0];
+        this.tiles[0][1][0] = this.tiles[0][2][1];
+        this.tiles[0][2][1] = this.tiles[0][1][2];
+        this.tiles[0][1][2] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[4][2][0];
-        tiles[4][2][0] = tiles[3][2][2];
-        tiles[3][2][2] = tiles[5][0][2];
-        tiles[5][0][2] = tiles[1][0][0];
-        tiles[1][0][0] = temp;
-        temp = tiles[4][2][2];
-        tiles[4][2][2] = tiles[3][0][2];
-        tiles[3][0][2] = tiles[5][0][0];
-        tiles[5][0][0] = tiles[1][2][0];
-        tiles[1][2][0] = temp;
+        temp = this.tiles[4][2][0];
+        this.tiles[4][2][0] = this.tiles[3][2][2];
+        this.tiles[3][2][2] = this.tiles[5][0][2];
+        this.tiles[5][0][2] = this.tiles[1][0][0];
+        this.tiles[1][0][0] = temp;
+        temp = this.tiles[4][2][2];
+        this.tiles[4][2][2] = this.tiles[3][0][2];
+        this.tiles[3][0][2] = this.tiles[5][0][0];
+        this.tiles[5][0][0] = this.tiles[1][2][0];
+        this.tiles[1][2][0] = temp;
         // Edges.
-        temp = tiles[4][2][1];
-        tiles[4][2][1] = tiles[3][1][2];
-        tiles[3][1][2] = tiles[5][0][1];
-        tiles[5][0][1] = tiles[1][1][0];
-        tiles[1][1][0] = temp;
+        temp = this.tiles[4][2][1];
+        this.tiles[4][2][1] = this.tiles[3][1][2];
+        this.tiles[3][1][2] = this.tiles[5][0][1];
+        this.tiles[5][0][1] = this.tiles[1][1][0];
+        this.tiles[1][1][0] = temp;
     }
 
     // Rotate the front face anti-clockwise.
     private void rotateFrontAntiClockwise() {
         // Rotate the front face.
         // Front face corner tiles.
-        int temp = tiles[0][0][0];
-        tiles[0][0][0] = tiles[0][0][2];
-        tiles[0][0][2] = tiles[0][2][2];
-        tiles[0][2][2] = tiles[0][2][0];
-        tiles[0][2][0] = temp;
-        // Front face edge tiles.
-        temp = tiles[0][0][1];
-        tiles[0][0][1] = tiles[0][1][2];
-        tiles[0][1][2] = tiles[0][2][1];
-        tiles[0][2][1] = tiles[0][1][0];
-        tiles[0][1][0] = temp;
+        int temp = this.tiles[0][0][0];
+        this.tiles[0][0][0] = this.tiles[0][0][2];
+        this.tiles[0][0][2] = this.tiles[0][2][2];
+        this.tiles[0][2][2] = this.tiles[0][2][0];
+        this.tiles[0][2][0] = temp;
+        // Front face edge this.tiles.
+        temp = this.tiles[0][0][1];
+        this.tiles[0][0][1] = this.tiles[0][1][2];
+        this.tiles[0][1][2] = this.tiles[0][2][1];
+        this.tiles[0][2][1] = this.tiles[0][1][0];
+        this.tiles[0][1][0] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[4][2][0];
-        tiles[4][2][0] = tiles[1][0][0];
-        tiles[1][0][0] = tiles[5][0][2];
-        tiles[5][0][2] = tiles[3][2][2];
-        tiles[3][2][2] = temp;
-        temp = tiles[4][2][2];
-        tiles[4][2][2] = tiles[1][2][0];
-        tiles[1][2][0] = tiles[5][0][0];
-        tiles[5][0][0] = tiles[3][0][2];
-        tiles[3][0][2] = temp;
+        temp = this.tiles[4][2][0];
+        this.tiles[4][2][0] = this.tiles[1][0][0];
+        this.tiles[1][0][0] = this.tiles[5][0][2];
+        this.tiles[5][0][2] = this.tiles[3][2][2];
+        this.tiles[3][2][2] = temp;
+        temp = this.tiles[4][2][2];
+        this.tiles[4][2][2] = this.tiles[1][2][0];
+        this.tiles[1][2][0] = this.tiles[5][0][0];
+        this.tiles[5][0][0] = this.tiles[3][0][2];
+        this.tiles[3][0][2] = temp;
         // Edges.
-        temp = tiles[4][2][1];
-        tiles[4][2][1] = tiles[1][1][0];
-        tiles[1][1][0] = tiles[5][0][1];
-        tiles[5][0][1] = tiles[3][1][2];
-        tiles[3][1][2] = temp;
+        temp = this.tiles[4][2][1];
+        this.tiles[4][2][1] = this.tiles[1][1][0];
+        this.tiles[1][1][0] = this.tiles[5][0][1];
+        this.tiles[5][0][1] = this.tiles[3][1][2];
+        this.tiles[3][1][2] = temp;
     }
 
     // Rotate the back face clockwise.
     private void rotateBackClockwise() {
         // Rotate the back face.
         // Back face corner tiles.
-        int temp = tiles[2][0][0];
-        tiles[2][0][0] = tiles[2][2][0];
-        tiles[2][2][0] = tiles[2][2][2];
-        tiles[2][2][2] = tiles[2][0][2];
-        tiles[2][0][2] = temp;
+        int temp = this.tiles[2][0][0];
+        this.tiles[2][0][0] = this.tiles[2][2][0];
+        this.tiles[2][2][0] = this.tiles[2][2][2];
+        this.tiles[2][2][2] = this.tiles[2][0][2];
+        this.tiles[2][0][2] = temp;
         // Back face edge tiles.
-        temp = tiles[2][0][1];
-        tiles[2][0][1] = tiles[2][1][0];
-        tiles[2][1][0] = tiles[2][2][1];
-        tiles[2][2][1] = tiles[2][1][2];
-        tiles[2][1][2] = temp;
+        temp = this.tiles[2][0][1];
+        this.tiles[2][0][1] = this.tiles[2][1][0];
+        this.tiles[2][1][0] = this.tiles[2][2][1];
+        this.tiles[2][2][1] = this.tiles[2][1][2];
+        this.tiles[2][1][2] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[4][0][2];
-        tiles[4][0][2] = tiles[1][2][2];
-        tiles[1][2][2] = tiles[5][2][0];
-        tiles[5][2][0] = tiles[3][0][0];
-        tiles[3][0][0] = temp;
-        temp = tiles[4][0][0];
-        tiles[4][0][0] = tiles[1][0][2];
-        tiles[1][0][2] = tiles[5][2][2];
-        tiles[5][2][2] = tiles[3][2][0];
-        tiles[3][2][0] = temp;
+        temp = this.tiles[4][0][2];
+        this.tiles[4][0][2] = this.tiles[1][2][2];
+        this.tiles[1][2][2] = this.tiles[5][2][0];
+        this.tiles[5][2][0] = this.tiles[3][0][0];
+        this.tiles[3][0][0] = temp;
+        temp = this.tiles[4][0][0];
+        this.tiles[4][0][0] = this.tiles[1][0][2];
+        this.tiles[1][0][2] = this.tiles[5][2][2];
+        this.tiles[5][2][2] = this.tiles[3][2][0];
+        this.tiles[3][2][0] = temp;
         // Edges.
-        temp = tiles[4][0][1];
-        tiles[4][0][1] = tiles[1][1][2];
-        tiles[1][1][2] = tiles[5][2][1];
-        tiles[5][2][1] = tiles[3][1][0];
-        tiles[3][1][0] = temp;
+        temp = this.tiles[4][0][1];
+        this.tiles[4][0][1] = this.tiles[1][1][2];
+        this.tiles[1][1][2] = this.tiles[5][2][1];
+        this.tiles[5][2][1] = this.tiles[3][1][0];
+        this.tiles[3][1][0] = temp;
     }
 
     // Rotate the back face anti-clockwise.
     private void rotateBackAntiClockwise() {
         // Rotate the back face.
         // Back face corner tiles.
-        int temp = tiles[2][0][0];
-        tiles[2][0][0] = tiles[2][0][2];
-        tiles[2][0][2] = tiles[2][2][2];
-        tiles[2][2][2] = tiles[2][2][0];
-        tiles[2][2][0] = temp;
+        int temp = this.tiles[2][0][0];
+        this.tiles[2][0][0] = this.tiles[2][0][2];
+        this.tiles[2][0][2] = this.tiles[2][2][2];
+        this.tiles[2][2][2] = this.tiles[2][2][0];
+        this.tiles[2][2][0] = temp;
         // Back face edge tiles.
-        temp = tiles[2][0][1];
-        tiles[2][0][1] = tiles[2][1][2];
-        tiles[2][1][2] = tiles[2][2][1];
-        tiles[2][2][1] = tiles[2][1][0];
-        tiles[2][1][0] = temp;
+        temp = this.tiles[2][0][1];
+        this.tiles[2][0][1] = this.tiles[2][1][2];
+        this.tiles[2][1][2] = this.tiles[2][2][1];
+        this.tiles[2][2][1] = this.tiles[2][1][0];
+        this.tiles[2][1][0] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[4][0][2];
-        tiles[4][0][2] = tiles[3][0][0];
-        tiles[3][0][0] = tiles[5][2][0];
-        tiles[5][2][0] = tiles[1][2][2];
-        tiles[1][2][2] = temp;
-        temp = tiles[4][0][0];
-        tiles[4][0][0] = tiles[3][2][0];
-        tiles[3][2][0] = tiles[5][2][2];
-        tiles[5][2][2] = tiles[1][0][2];
-        tiles[1][0][2] = temp;
+        temp = this.tiles[4][0][2];
+        this.tiles[4][0][2] = this.tiles[3][0][0];
+        this.tiles[3][0][0] = this.tiles[5][2][0];
+        this.tiles[5][2][0] = this.tiles[1][2][2];
+        this.tiles[1][2][2] = temp;
+        temp = this.tiles[4][0][0];
+        this.tiles[4][0][0] = this.tiles[3][2][0];
+        this.tiles[3][2][0] = this.tiles[5][2][2];
+        this.tiles[5][2][2] = this.tiles[1][0][2];
+        this.tiles[1][0][2] = temp;
         // Edges.
-        temp = tiles[4][0][1];
-        tiles[4][0][1] = tiles[3][1][0];
-        tiles[3][1][0] = tiles[5][2][1];
-        tiles[5][2][1] = tiles[1][1][2];
-        tiles[1][1][2] = temp;
+        temp = this.tiles[4][0][1];
+        this.tiles[4][0][1] = this.tiles[3][1][0];
+        this.tiles[3][1][0] = this.tiles[5][2][1];
+        this.tiles[5][2][1] = this.tiles[1][1][2];
+        this.tiles[1][1][2] = temp;
     }
 
     // Rotate the left face clockwise.
     private void rotateLeftClockwise() {
         // Rotate the left face.
         // Left face corner tiles.
-        int temp = tiles[3][0][0];
-        tiles[3][0][0] = tiles[3][2][0];
-        tiles[3][2][0] = tiles[3][2][2];
-        tiles[3][2][2] = tiles[3][0][2];
-        tiles[3][0][2] = temp;
+        int temp = this.tiles[3][0][0];
+        this.tiles[3][0][0] = this.tiles[3][2][0];
+        this.tiles[3][2][0] = this.tiles[3][2][2];
+        this.tiles[3][2][2] = this.tiles[3][0][2];
+        this.tiles[3][0][2] = temp;
         // Left face edge tiles.
-        temp = tiles[3][0][1];
-        tiles[3][0][1] = tiles[3][1][0];
-        tiles[3][1][0] = tiles[3][2][1];
-        tiles[3][2][1] = tiles[3][1][2];
-        tiles[3][1][2] = temp;
+        temp = this.tiles[3][0][1];
+        this.tiles[3][0][1] = this.tiles[3][1][0];
+        this.tiles[3][1][0] = this.tiles[3][2][1];
+        this.tiles[3][2][1] = this.tiles[3][1][2];
+        this.tiles[3][1][2] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[4][0][0];
-        tiles[4][0][0] = tiles[2][2][2];
-        tiles[2][2][2] = tiles[5][0][0];
-        tiles[5][0][0] = tiles[0][0][0];
-        tiles[0][0][0] = temp;
-        temp = tiles[4][2][0];
-        tiles[4][2][0] = tiles[2][0][2];
-        tiles[2][0][2] = tiles[5][2][0];
-        tiles[5][2][0] = tiles[0][2][0];
-        tiles[0][2][0] = temp;
+        temp = this.tiles[4][0][0];
+        this.tiles[4][0][0] = this.tiles[2][2][2];
+        this.tiles[2][2][2] = this.tiles[5][0][0];
+        this.tiles[5][0][0] = this.tiles[0][0][0];
+        this.tiles[0][0][0] = temp;
+        temp = this.tiles[4][2][0];
+        this.tiles[4][2][0] = this.tiles[2][0][2];
+        this.tiles[2][0][2] = this.tiles[5][2][0];
+        this.tiles[5][2][0] = this.tiles[0][2][0];
+        this.tiles[0][2][0] = temp;
         // Edges.
-        temp = tiles[4][1][0];
-        tiles[4][1][0] = tiles[2][1][2];
-        tiles[2][1][2] = tiles[5][1][0];
-        tiles[5][1][0] = tiles[0][1][0];
-        tiles[0][1][0] = temp;
+        temp = this.tiles[4][1][0];
+        this.tiles[4][1][0] = this.tiles[2][1][2];
+        this.tiles[2][1][2] = this.tiles[5][1][0];
+        this.tiles[5][1][0] = this.tiles[0][1][0];
+        this.tiles[0][1][0] = temp;
 
     }
 
@@ -437,245 +444,245 @@ public class Cube implements RubikCube, Comparable<Cube> {
     private void rotateLeftAntiClockwise() {
         // Rotate the left face.
         // Left face corner tiles.
-        int temp = tiles[3][0][0];
-        tiles[3][0][0] = tiles[3][0][2];
-        tiles[3][0][2] = tiles[3][2][2];
-        tiles[3][2][2] = tiles[3][2][0];
-        tiles[3][2][0] = temp;
+        int temp = this.tiles[3][0][0];
+        this.tiles[3][0][0] = this.tiles[3][0][2];
+        this.tiles[3][0][2] = this.tiles[3][2][2];
+        this.tiles[3][2][2] = this.tiles[3][2][0];
+        this.tiles[3][2][0] = temp;
         // Left face edge tiles.
-        temp = tiles[3][0][1];
-        tiles[3][0][1] = tiles[3][1][2];
-        tiles[3][1][2] = tiles[3][2][1];
-        tiles[3][2][1] = tiles[3][1][0];
-        tiles[3][1][0] = temp;
+        temp = this.tiles[3][0][1];
+        this.tiles[3][0][1] = this.tiles[3][1][2];
+        this.tiles[3][1][2] = this.tiles[3][2][1];
+        this.tiles[3][2][1] = this.tiles[3][1][0];
+        this.tiles[3][1][0] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[4][0][0];
-        tiles[4][0][0] = tiles[0][0][0];
-        tiles[0][0][0] = tiles[5][0][0];
-        tiles[5][0][0] = tiles[2][2][2];
-        tiles[2][2][2] = temp;
-        temp = tiles[4][2][0];
-        tiles[4][2][0] = tiles[0][2][0];
-        tiles[0][2][0] = tiles[5][2][0];
-        tiles[5][2][0] = tiles[2][0][2];
-        tiles[2][0][2] = temp;
+        temp = this.tiles[4][0][0];
+        this.tiles[4][0][0] = this.tiles[0][0][0];
+        this.tiles[0][0][0] = this.tiles[5][0][0];
+        this.tiles[5][0][0] = this.tiles[2][2][2];
+        this.tiles[2][2][2] = temp;
+        temp = this.tiles[4][2][0];
+        this.tiles[4][2][0] = this.tiles[0][2][0];
+        this.tiles[0][2][0] = this.tiles[5][2][0];
+        this.tiles[5][2][0] = this.tiles[2][0][2];
+        this.tiles[2][0][2] = temp;
         // Edges.
-        temp = tiles[4][1][0];
-        tiles[4][1][0] = tiles[0][1][0];
-        tiles[0][1][0] = tiles[5][1][0];
-        tiles[5][1][0] = tiles[2][1][2];
-        tiles[2][1][2] = temp;
+        temp = this.tiles[4][1][0];
+        this.tiles[4][1][0] = this.tiles[0][1][0];
+        this.tiles[0][1][0] = this.tiles[5][1][0];
+        this.tiles[5][1][0] = this.tiles[2][1][2];
+        this.tiles[2][1][2] = temp;
     }
 
     // Rotate the right face clockwise.
     private void rotateRightClockwise() {
         // Rotate the right face.
         // Right face corner tiles.
-        int temp = tiles[1][0][0];
-        tiles[1][0][0] = tiles[1][2][0];
-        tiles[1][2][0] = tiles[1][2][2];
-        tiles[1][2][2] = tiles[1][0][2];
-        tiles[1][0][2] = temp;
+        int temp = this.tiles[1][0][0];
+        this.tiles[1][0][0] = this.tiles[1][2][0];
+        this.tiles[1][2][0] = this.tiles[1][2][2];
+        this.tiles[1][2][2] = this.tiles[1][0][2];
+        this.tiles[1][0][2] = temp;
         // Right face edge tiles.
-        temp = tiles[1][0][1];
-        tiles[1][0][1] = tiles[1][1][0];
-        tiles[1][1][0] = tiles[1][2][1];
-        tiles[1][2][1] = tiles[1][1][2];
-        tiles[1][1][2] = temp;
+        temp = this.tiles[1][0][1];
+        this.tiles[1][0][1] = this.tiles[1][1][0];
+        this.tiles[1][1][0] = this.tiles[1][2][1];
+        this.tiles[1][2][1] = this.tiles[1][1][2];
+        this.tiles[1][1][2] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[4][2][2];
-        tiles[4][2][2] = tiles[0][2][2];
-        tiles[0][2][2] = tiles[5][2][2];
-        tiles[5][2][2] = tiles[2][0][0];
-        tiles[2][0][0] = temp;
-        temp = tiles[4][0][2];
-        tiles[4][0][2] = tiles[0][0][2];
-        tiles[0][0][2] = tiles[5][0][2];
-        tiles[5][0][2] = tiles[2][2][0];
-        tiles[2][2][0] = temp;
+        temp = this.tiles[4][2][2];
+        this.tiles[4][2][2] = this.tiles[0][2][2];
+        this.tiles[0][2][2] = this.tiles[5][2][2];
+        this.tiles[5][2][2] = this.tiles[2][0][0];
+        this.tiles[2][0][0] = temp;
+        temp = this.tiles[4][0][2];
+        this.tiles[4][0][2] = this.tiles[0][0][2];
+        this.tiles[0][0][2] = this.tiles[5][0][2];
+        this.tiles[5][0][2] = this.tiles[2][2][0];
+        this.tiles[2][2][0] = temp;
         // Edges.
-        temp = tiles[4][1][2];
-        tiles[4][1][2] = tiles[0][1][2];
-        tiles[0][1][2] = tiles[5][1][2];
-        tiles[5][1][2] = tiles[2][1][0];
-        tiles[2][1][0] = temp;
+        temp = this.tiles[4][1][2];
+        this.tiles[4][1][2] = this.tiles[0][1][2];
+        this.tiles[0][1][2] = this.tiles[5][1][2];
+        this.tiles[5][1][2] = this.tiles[2][1][0];
+        this.tiles[2][1][0] = temp;
     }
 
     // Rotate the right face anti-clockwise.
     private void rotateRightAntiClockwise() {
         // Rotate the right face.
         // Right face corner tiles.
-        int temp = tiles[1][0][0];
-        tiles[1][0][0] = tiles[1][0][2];
-        tiles[1][0][2] = tiles[1][2][2];
-        tiles[1][2][2] = tiles[1][2][0];
-        tiles[1][2][0] = temp;
+        int temp = this.tiles[1][0][0];
+        this.tiles[1][0][0] = this.tiles[1][0][2];
+        this.tiles[1][0][2] = this.tiles[1][2][2];
+        this.tiles[1][2][2] = this.tiles[1][2][0];
+        this.tiles[1][2][0] = temp;
         // Right face edge tiles.
-        temp = tiles[1][0][1];
-        tiles[1][0][1] = tiles[1][1][2];
-        tiles[1][1][2] = tiles[1][2][1];
-        tiles[1][2][1] = tiles[1][1][0];
-        tiles[1][1][0] = temp;
+        temp = this.tiles[1][0][1];
+        this.tiles[1][0][1] = this.tiles[1][1][2];
+        this.tiles[1][1][2] = this.tiles[1][2][1];
+        this.tiles[1][2][1] = this.tiles[1][1][0];
+        this.tiles[1][1][0] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[4][2][2];
-        tiles[4][2][2] = tiles[2][0][0];
-        tiles[2][0][0] = tiles[5][2][2];
-        tiles[5][2][2] = tiles[0][2][2];
-        tiles[0][2][2] = temp;
-        temp = tiles[4][0][2];
-        tiles[4][0][2] = tiles[2][2][0];
-        tiles[2][2][0] = tiles[5][0][2];
-        tiles[5][0][2] = tiles[0][0][2];
-        tiles[0][0][2] = temp;
+        temp = this.tiles[4][2][2];
+        this.tiles[4][2][2] = this.tiles[2][0][0];
+        this.tiles[2][0][0] = this.tiles[5][2][2];
+        this.tiles[5][2][2] = this.tiles[0][2][2];
+        this.tiles[0][2][2] = temp;
+        temp = this.tiles[4][0][2];
+        this.tiles[4][0][2] = this.tiles[2][2][0];
+        this.tiles[2][2][0] = this.tiles[5][0][2];
+        this.tiles[5][0][2] = this.tiles[0][0][2];
+        this.tiles[0][0][2] = temp;
         // Edges.
-        temp = tiles[4][1][2];
-        tiles[4][1][2] = tiles[2][1][0];
-        tiles[2][1][0] = tiles[5][1][2];
-        tiles[5][1][2] = tiles[0][1][2];
-        tiles[0][1][2] = temp;
+        temp = this.tiles[4][1][2];
+        this.tiles[4][1][2] = this.tiles[2][1][0];
+        this.tiles[2][1][0] = this.tiles[5][1][2];
+        this.tiles[5][1][2] = this.tiles[0][1][2];
+        this.tiles[0][1][2] = temp;
     }
 
     // Rotate the top face clockwise.
     private void rotateUpClockwise() {
         // Rotate the top face.
         // Top face corner tiles.
-        int temp = tiles[4][0][0];
-        tiles[4][0][0] = tiles[4][2][0];
-        tiles[4][2][0] = tiles[4][2][2];
-        tiles[4][2][2] = tiles[4][0][2];
-        tiles[4][0][2] = temp;
+        int temp = this.tiles[4][0][0];
+        this.tiles[4][0][0] = this.tiles[4][2][0];
+        this.tiles[4][2][0] = this.tiles[4][2][2];
+        this.tiles[4][2][2] = this.tiles[4][0][2];
+        this.tiles[4][0][2] = temp;
         // Top face edge tiles.
-        temp = tiles[4][0][1];
-        tiles[4][0][1] = tiles[4][1][0];
-        tiles[4][1][0] = tiles[4][2][1];
-        tiles[4][2][1] = tiles[4][1][2];
-        tiles[4][1][2] = temp;
+        temp = this.tiles[4][0][1];
+        this.tiles[4][0][1] = this.tiles[4][1][0];
+        this.tiles[4][1][0] = this.tiles[4][2][1];
+        this.tiles[4][2][1] = this.tiles[4][1][2];
+        this.tiles[4][1][2] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[2][0][2];
-        tiles[2][0][2] = tiles[3][0][2];
-        tiles[3][0][2] = tiles[0][0][2];
-        tiles[0][0][2] = tiles[1][0][2];
-        tiles[1][0][2] = temp;
-        temp = tiles[2][0][0];
-        tiles[2][0][0] = tiles[3][0][0];
-        tiles[3][0][0] = tiles[0][0][0];
-        tiles[0][0][0] = tiles[1][0][0];
-        tiles[1][0][0] = temp;
+        temp = this.tiles[2][0][2];
+        this.tiles[2][0][2] = this.tiles[3][0][2];
+        this.tiles[3][0][2] = this.tiles[0][0][2];
+        this.tiles[0][0][2] = this.tiles[1][0][2];
+        this.tiles[1][0][2] = temp;
+        temp = this.tiles[2][0][0];
+        this.tiles[2][0][0] = this.tiles[3][0][0];
+        this.tiles[3][0][0] = this.tiles[0][0][0];
+        this.tiles[0][0][0] = this.tiles[1][0][0];
+        this.tiles[1][0][0] = temp;
         // Edges.
-        temp = tiles[2][0][1];
-        tiles[2][0][1] = tiles[3][0][1];
-        tiles[3][0][1] = tiles[0][0][1];
-        tiles[0][0][1] = tiles[1][0][1];
-        tiles[1][0][1] = temp;
+        temp = this.tiles[2][0][1];
+        this.tiles[2][0][1] = this.tiles[3][0][1];
+        this.tiles[3][0][1] = this.tiles[0][0][1];
+        this.tiles[0][0][1] = this.tiles[1][0][1];
+        this.tiles[1][0][1] = temp;
     }
 
     // Rotate the top face anti-clockwise.
     private void rotateUpAntiClockwise() {
         // Rotate the top face.
         // Top face corner tiles.
-        int temp = tiles[4][0][0];
-        tiles[4][0][0] = tiles[4][0][2];
-        tiles[4][0][2] = tiles[4][2][2];
-        tiles[4][2][2] = tiles[4][2][0];
-        tiles[4][2][0] = temp;
+        int temp = this.tiles[4][0][0];
+        this.tiles[4][0][0] = this.tiles[4][0][2];
+        this.tiles[4][0][2] = this.tiles[4][2][2];
+        this.tiles[4][2][2] = this.tiles[4][2][0];
+        this.tiles[4][2][0] = temp;
         // Top face edge tiles.
-        temp = tiles[4][0][1];
-        tiles[4][0][1] = tiles[4][1][2];
-        tiles[4][1][2] = tiles[4][2][1];
-        tiles[4][2][1] = tiles[4][1][0];
-        tiles[4][1][0] = temp;
+        temp = this.tiles[4][0][1];
+        this.tiles[4][0][1] = this.tiles[4][1][2];
+        this.tiles[4][1][2] = this.tiles[4][2][1];
+        this.tiles[4][2][1] = this.tiles[4][1][0];
+        this.tiles[4][1][0] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[2][0][2];
-        tiles[2][0][2] = tiles[1][0][2];
-        tiles[1][0][2] = tiles[0][0][2];
-        tiles[0][0][2] = tiles[3][0][2];
-        tiles[3][0][2] = temp;
-        temp = tiles[2][0][0];
-        tiles[2][0][0] = tiles[1][0][0];
-        tiles[1][0][0] = tiles[0][0][0];
-        tiles[0][0][0] = tiles[3][0][0];
-        tiles[3][0][0] = temp;
+        temp = this.tiles[2][0][2];
+        this.tiles[2][0][2] = this.tiles[1][0][2];
+        this.tiles[1][0][2] = this.tiles[0][0][2];
+        this.tiles[0][0][2] = this.tiles[3][0][2];
+        this.tiles[3][0][2] = temp;
+        temp = this.tiles[2][0][0];
+        this.tiles[2][0][0] = this.tiles[1][0][0];
+        this.tiles[1][0][0] = this.tiles[0][0][0];
+        this.tiles[0][0][0] = this.tiles[3][0][0];
+        this.tiles[3][0][0] = temp;
         // Edges.
-        temp = tiles[2][0][1];
-        tiles[2][0][1] = tiles[1][0][1];
-        tiles[1][0][1] = tiles[0][0][1];
-        tiles[0][0][1] = tiles[3][0][1];
-        tiles[3][0][1] = temp;
+        temp = this.tiles[2][0][1];
+        this.tiles[2][0][1] = this.tiles[1][0][1];
+        this.tiles[1][0][1] = this.tiles[0][0][1];
+        this.tiles[0][0][1] = this.tiles[3][0][1];
+        this.tiles[3][0][1] = temp;
     }
 
     // Rotate the bottom face clockwise.
     private void rotateDownClockwise() {
         // Rotate the bottom face.
         // Bottom face corner tiles.
-        int temp = tiles[5][0][0];
-        tiles[5][0][0] = tiles[5][2][0];
-        tiles[5][2][0] = tiles[5][2][2];
-        tiles[5][2][2] = tiles[5][0][2];
-        tiles[5][0][2] = temp;
+        int temp = this.tiles[5][0][0];
+        this.tiles[5][0][0] = this.tiles[5][2][0];
+        this.tiles[5][2][0] = this.tiles[5][2][2];
+        this.tiles[5][2][2] = this.tiles[5][0][2];
+        this.tiles[5][0][2] = temp;
         // Bottom face edge tiles.
-        temp = tiles[5][0][1];
-        tiles[5][0][1] = tiles[5][1][0];
-        tiles[5][1][0] = tiles[5][2][1];
-        tiles[5][2][1] = tiles[5][1][2];
-        tiles[5][1][2] = temp;
+        temp = this.tiles[5][0][1];
+        this.tiles[5][0][1] = this.tiles[5][1][0];
+        this.tiles[5][1][0] = this.tiles[5][2][1];
+        this.tiles[5][2][1] = this.tiles[5][1][2];
+        this.tiles[5][1][2] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[0][2][0];
-        tiles[0][2][0] = tiles[3][2][0];
-        tiles[3][2][0] = tiles[2][2][0];
-        tiles[2][2][0] = tiles[1][2][0];
-        tiles[1][2][0] = temp;
-        temp = tiles[0][2][2];
-        tiles[0][2][2] = tiles[3][2][2];
-        tiles[3][2][2] = tiles[2][2][2];
-        tiles[2][2][2] = tiles[1][2][2];
-        tiles[1][2][2] = temp;
+        temp = this.tiles[0][2][0];
+        this.tiles[0][2][0] = this.tiles[3][2][0];
+        this.tiles[3][2][0] = this.tiles[2][2][0];
+        this.tiles[2][2][0] = this.tiles[1][2][0];
+        this.tiles[1][2][0] = temp;
+        temp = this.tiles[0][2][2];
+        this.tiles[0][2][2] = this.tiles[3][2][2];
+        this.tiles[3][2][2] = this.tiles[2][2][2];
+        this.tiles[2][2][2] = this.tiles[1][2][2];
+        this.tiles[1][2][2] = temp;
         // Edges.
-        temp = tiles[0][2][1];
-        tiles[0][2][1] = tiles[3][2][1];
-        tiles[3][2][1] = tiles[2][2][1];
-        tiles[2][2][1] = tiles[1][2][1];
-        tiles[1][2][1] = temp;
+        temp = this.tiles[0][2][1];
+        this.tiles[0][2][1] = this.tiles[3][2][1];
+        this.tiles[3][2][1] = this.tiles[2][2][1];
+        this.tiles[2][2][1] = this.tiles[1][2][1];
+        this.tiles[1][2][1] = temp;
     }
 
     // Rotate the bottom face anti-clockwise.
     private void rotateDownAntiClockwise() {
         // Rotate the bottom face.
         // Bottom face corner tiles.
-        int temp = tiles[5][0][0];
-        tiles[5][0][0] = tiles[5][0][2];
-        tiles[5][0][2] = tiles[5][2][2];
-        tiles[5][2][2] = tiles[5][2][0];
-        tiles[5][2][0] = temp;
+        int temp = this.tiles[5][0][0];
+        this.tiles[5][0][0] = this.tiles[5][0][2];
+        this.tiles[5][0][2] = this.tiles[5][2][2];
+        this.tiles[5][2][2] = this.tiles[5][2][0];
+        this.tiles[5][2][0] = temp;
         // Bottom face edge tiles.
-        temp = tiles[5][0][1];
-        tiles[5][0][1] = tiles[5][1][2];
-        tiles[5][1][2] = tiles[5][2][1];
-        tiles[5][2][1] = tiles[5][1][0];
-        tiles[5][1][0] = temp;
+        temp = this.tiles[5][0][1];
+        this.tiles[5][0][1] = this.tiles[5][1][2];
+        this.tiles[5][1][2] = this.tiles[5][2][1];
+        this.tiles[5][2][1] = this.tiles[5][1][0];
+        this.tiles[5][1][0] = temp;
         // Rotate the adjacent faces.
         // Corners.
-        temp = tiles[0][2][0];
-        tiles[0][2][0] = tiles[1][2][0];
-        tiles[1][2][0] = tiles[2][2][0];
-        tiles[2][2][0] = tiles[3][2][0];
-        tiles[3][2][0] = temp;
-        temp = tiles[0][2][2];
-        tiles[0][2][2] = tiles[1][2][2];
-        tiles[1][2][2] = tiles[2][2][2];
-        tiles[2][2][2] = tiles[3][2][2];
-        tiles[3][2][2] = temp;
+        temp = this.tiles[0][2][0];
+        this.tiles[0][2][0] = this.tiles[1][2][0];
+        this.tiles[1][2][0] = this.tiles[2][2][0];
+        this.tiles[2][2][0] = this.tiles[3][2][0];
+        this.tiles[3][2][0] = temp;
+        temp = this.tiles[0][2][2];
+        this.tiles[0][2][2] = this.tiles[1][2][2];
+        this.tiles[1][2][2] = this.tiles[2][2][2];
+        this.tiles[2][2][2] = this.tiles[3][2][2];
+        this.tiles[3][2][2] = temp;
         // Edges.
-        temp = tiles[0][2][1];
-        tiles[0][2][1] = tiles[1][2][1];
-        tiles[1][2][1] = tiles[2][2][1];
-        tiles[2][2][1] = tiles[3][2][1];
-        tiles[3][2][1] = temp;
+        temp = this.tiles[0][2][1];
+        this.tiles[0][2][1] = this.tiles[1][2][1];
+        this.tiles[1][2][1] = this.tiles[2][2][1];
+        this.tiles[2][2][1] = this.tiles[3][2][1];
+        this.tiles[3][2][1] = temp;
     }
 
     @Override
@@ -745,28 +752,28 @@ public class Cube implements RubikCube, Comparable<Cube> {
         sb.append("---------------------\n");
         sb.append("\t\t Top\n");
         sb.append("\t\t");
-        sb.append(tiles[4][0][0]).append(" ").append(tiles[4][0][1]).append(" ").append(tiles[4][0][2]).append("\n");
+        sb.append(this.tiles[4][0][0]).append(" ").append(this.tiles[4][0][1]).append(" ").append(this.tiles[4][0][2]).append("\n");
         sb.append("\t\t");
-        sb.append(tiles[4][1][0]).append(" ").append(tiles[4][1][1]).append(" ").append(tiles[4][1][2]).append("\n");
-        sb.append("Left\t").append(tiles[4][2][0]).append(" ").append(tiles[4][2][1]).append(" ").append(tiles[4][2][2]).append("\t").append("Right\tBack\n");
-        sb.append(tiles[3][0][0]).append(" ").append(tiles[3][0][1]).append(" ").append(tiles[3][0][2]).append("\t");
-        sb.append(tiles[0][0][0]).append(" ").append(tiles[0][0][1]).append(" ").append(tiles[0][0][2]).append("\t");
-        sb.append(tiles[1][0][0]).append(" ").append(tiles[1][0][1]).append(" ").append(tiles[1][0][2]).append("\t");
-        sb.append(tiles[2][0][0]).append(" ").append(tiles[2][0][1]).append(" ").append(tiles[2][0][2]).append("\n");
-        sb.append(tiles[3][1][0]).append(" ").append(tiles[3][1][1]).append(" ").append(tiles[3][1][2]).append("\t");
-        sb.append(tiles[0][1][0]).append(" ").append(tiles[0][1][1]).append(" ").append(tiles[0][1][2]).append("\t");
-        sb.append(tiles[1][1][0]).append(" ").append(tiles[1][1][1]).append(" ").append(tiles[1][1][2]).append("\t");
-        sb.append(tiles[2][1][0]).append(" ").append(tiles[2][1][1]).append(" ").append(tiles[2][1][2]).append("\n");
-        sb.append(tiles[3][2][0]).append(" ").append(tiles[3][2][1]).append(" ").append(tiles[3][2][2]).append("\t");
-        sb.append(tiles[0][2][0]).append(" ").append(tiles[0][2][1]).append(" ").append(tiles[0][2][2]).append("\t");
-        sb.append(tiles[1][2][0]).append(" ").append(tiles[1][2][1]).append(" ").append(tiles[1][2][2]).append("\t");
-        sb.append(tiles[2][2][0]).append(" ").append(tiles[2][2][1]).append(" ").append(tiles[2][2][2]).append("\n");
+        sb.append(this.tiles[4][1][0]).append(" ").append(this.tiles[4][1][1]).append(" ").append(this.tiles[4][1][2]).append("\n");
+        sb.append("Left\t").append(this.tiles[4][2][0]).append(" ").append(this.tiles[4][2][1]).append(" ").append(this.tiles[4][2][2]).append("\t").append("Right\tBack\n");
+        sb.append(this.tiles[3][0][0]).append(" ").append(this.tiles[3][0][1]).append(" ").append(this.tiles[3][0][2]).append("\t");
+        sb.append(this.tiles[0][0][0]).append(" ").append(this.tiles[0][0][1]).append(" ").append(this.tiles[0][0][2]).append("\t");
+        sb.append(this.tiles[1][0][0]).append(" ").append(this.tiles[1][0][1]).append(" ").append(this.tiles[1][0][2]).append("\t");
+        sb.append(this.tiles[2][0][0]).append(" ").append(this.tiles[2][0][1]).append(" ").append(this.tiles[2][0][2]).append("\n");
+        sb.append(this.tiles[3][1][0]).append(" ").append(this.tiles[3][1][1]).append(" ").append(this.tiles[3][1][2]).append("\t");
+        sb.append(this.tiles[0][1][0]).append(" ").append(this.tiles[0][1][1]).append(" ").append(this.tiles[0][1][2]).append("\t");
+        sb.append(this.tiles[1][1][0]).append(" ").append(this.tiles[1][1][1]).append(" ").append(this.tiles[1][1][2]).append("\t");
+        sb.append(this.tiles[2][1][0]).append(" ").append(this.tiles[2][1][1]).append(" ").append(this.tiles[2][1][2]).append("\n");
+        sb.append(this.tiles[3][2][0]).append(" ").append(this.tiles[3][2][1]).append(" ").append(this.tiles[3][2][2]).append("\t");
+        sb.append(this.tiles[0][2][0]).append(" ").append(this.tiles[0][2][1]).append(" ").append(this.tiles[0][2][2]).append("\t");
+        sb.append(this.tiles[1][2][0]).append(" ").append(this.tiles[1][2][1]).append(" ").append(this.tiles[1][2][2]).append("\t");
+        sb.append(this.tiles[2][2][0]).append(" ").append(this.tiles[2][2][1]).append(" ").append(this.tiles[2][2][2]).append("\n");
         sb.append("\t\t");
-        sb.append(tiles[5][0][0]).append(" ").append(tiles[5][0][1]).append(" ").append(tiles[5][0][2]).append("\n");
+        sb.append(this.tiles[5][0][0]).append(" ").append(this.tiles[5][0][1]).append(" ").append(this.tiles[5][0][2]).append("\n");
         sb.append("\t\t");
-        sb.append(tiles[5][1][0]).append(" ").append(tiles[5][1][1]).append(" ").append(tiles[5][1][2]).append("\n");
+        sb.append(this.tiles[5][1][0]).append(" ").append(this.tiles[5][1][1]).append(" ").append(this.tiles[5][1][2]).append("\n");
         sb.append("\t\t");
-        sb.append(tiles[5][2][0]).append(" ").append(tiles[5][2][1]).append(" ").append(tiles[5][2][2]).append("\n");
+        sb.append(this.tiles[5][2][0]).append(" ").append(this.tiles[5][2][1]).append(" ").append(this.tiles[5][2][2]).append("\n");
         sb.append("\t\tBottom\n");
         sb.append("---------------------\n");
         System.out.println(sb);
