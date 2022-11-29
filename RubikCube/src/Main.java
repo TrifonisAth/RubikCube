@@ -6,9 +6,9 @@ import java.util.Collections;
 
 public  class Main {
         public   static   void  main(String[] args) {
-            Cube initialState =  new  Cube(1);
+            Cube initialState =  new  Cube(3);
             initialState.randomize();
-            initialState.countDistance();
+            initialState.countTotalDistance();
             Astar astar =  new  Astar();
             long start = System.currentTimeMillis();
             Cube terminalState = astar.AstarClosedSet(initialState);

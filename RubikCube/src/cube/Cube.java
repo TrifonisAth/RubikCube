@@ -8,7 +8,7 @@ public class Cube implements RubikCube, Comparable<Cube> {
     // Each integer represents a color.
     private int[][][] tiles;
     // Heuristic score.
-    private int score;
+    private double score;
     // Number of correct faces needed to solve the cube.
     private int K;
     // The parent state.
@@ -49,7 +49,7 @@ public class Cube implements RubikCube, Comparable<Cube> {
         this.K = num;
     }
 
-    public Cube(){
+    public Cube() {
         this(6);
     }
 
@@ -121,11 +121,11 @@ public class Cube implements RubikCube, Comparable<Cube> {
         this.parent = parent;
     }
 
-    int getScore() {
+    double getScore() {
         return score;
     }
 
-    void setScore(int score) {
+    void setScore(double score) {
         this.score = score;
     }
 
@@ -148,62 +148,62 @@ public class Cube implements RubikCube, Comparable<Cube> {
         Cube child = new Cube(this.getTiles(), counter, this.K);
         // Rotate the faces of the cube evaluate the distance, set the parent and add the child to the list.
         child.F_r();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.F_l();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.R_r();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.R_l();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.B_r();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.B_l();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.L_r();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.L_l();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.U_r();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.U_l();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.D_r();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
         child = new Cube(this.getTiles(), counter, this.K);
         child.D_l();
-        child.countDistance();
+        child.countTotalDistance();
         child.setParent(this);
         children.add(child);
 
@@ -211,38 +211,78 @@ public class Cube implements RubikCube, Comparable<Cube> {
     }
 
     // Calculate distance for every move that the tile needs to get to the correct place.
-    public void countDistance() {
-        // TODO: maybe divide the distance by 4...
-        int distance = 0;
+    public void countTotalDistance() {
+        double distance = 0;
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 3; j++) {
                 for (int k = 0; k < 3; k++) {
                     // Skip the center tile.
-                    if (j==1 && k==1) continue;
+                    if (j == 1 && k == 1) continue;
                     int tileA = this.tiles[i][j][k];
                     int tileB = solved[i][j][k];
-                    if (tileA != tileB) {
-                        if ((tileA == 1 && tileB == 3) || (tileA == 3 && tileB == 1) || (tileA == 2 && tileB == 4) || (tileA == 4 && tileB == 2)
-                                || (tileA == 5 && tileB == 6) || (tileA == 6 && tileB == 5)) {
-                            distance += 2;
-                        } else ++distance;
-                    }
+                    distance += getDistance(tileA, tileB);
                 }
             }
         }
         this.updateScore(distance);
     }
 
+    // Calculate the sum of the distances for corners and edges.
+    public void countTotalDistanceCornersEdges() {
+        double distanceCorners = 0;
+        double distanceEdges = 0;
+        for (int i = 0; i < 6; i++) {
+            // Corners.
+            int tileA = this.tiles[i][0][0];
+            int tileB = solved[i][0][0];
+            distanceCorners += getDistance(tileA, tileB);
+            tileA = this.tiles[i][0][2];
+            tileB = solved[i][0][2];
+            distanceCorners += getDistance(tileA, tileB);
+            tileA = this.tiles[i][2][0];
+            tileB = solved[i][2][0];
+            distanceCorners += getDistance(tileA, tileB);
+            tileA = this.tiles[i][2][2];
+            tileB = solved[i][2][2];
+            distanceCorners += getDistance(tileA, tileB);
+            // Edges.
+            tileA = this.tiles[i][0][1];
+            tileB = solved[i][0][1];
+            distanceEdges += getDistance(tileA, tileB);
+            tileA = this.tiles[i][1][0];
+            tileB = solved[i][1][0];
+            distanceEdges += getDistance(tileA, tileB);
+            tileA = this.tiles[i][1][2];
+            tileB = solved[i][1][2];
+            distanceEdges += getDistance(tileA, tileB);
+            tileA = this.tiles[i][2][1];
+            tileB = solved[i][2][1];
+            distanceEdges += getDistance(tileA, tileB);
+            this.updateScore((distanceCorners + distanceEdges)/ 24);
+        }
+    }
+
+    // Calculate the distance between two tiles. The distance is the number of moves that the tile needs to get to the correct place.
+    private int getDistance(int a, int b) {
+        if (a != b) {
+            if ((a == 1 && b == 3) || (a == 3 && b == 1) || (a == 2 && b == 4) || (a == 4 && b == 2)
+                    || (a == 5 && b == 6) || (a == 6 && b == 5)) {
+                return 2;
+            }
+            return 1;
+        }
+        return 0;
+    }
 
 
-    private void updateScore(int number) {
+    private void updateScore(double number) {
         this.score += number;
     }
 
     // Generate a random cube.
     public void randomize() {
         Random random = new Random();
-        int n = random.nextInt(15, 30);
+        int n = random.nextInt(10, 15);
         for (int i = 0; i < n; i++) {
             int m = random.nextInt(12);
             switch (m) {
