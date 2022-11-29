@@ -36,6 +36,9 @@ public class Cube implements RubikCube, Comparable<Cube> {
 
 
     public Cube(int num) {
+        if (num < 1 || num > 6) {
+            throw new IllegalArgumentException("Invalid number of correct faces.");
+        }
         // Initialize the cube to a solved state.
         this.tiles = new int[6][3][3];
         for (int i = 0; i < 6; i++) {
@@ -142,71 +145,32 @@ public class Cube implements RubikCube, Comparable<Cube> {
         }
     }
 
-    public ArrayList<Cube> getChildren(int counter) {
+    public ArrayList<Cube> getChildren(int counter, int heuristic) {
+        if (heuristic != 1 && heuristic != 0) {
+            throw new IllegalArgumentException("Invalid heuristic.");
+        }
         ArrayList<Cube> children = new ArrayList<>();
-        // Create a copy of the current cube.
-        Cube child = new Cube(this.getTiles(), counter, this.K);
-        // Rotate the faces of the cube evaluate the distance, set the parent and add the child to the list.
-        child.F_r();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.F_l();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.R_r();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.R_l();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.B_r();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.B_l();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.L_r();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.L_l();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.U_r();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.U_l();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.D_r();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-        child = new Cube(this.getTiles(), counter, this.K);
-        child.D_l();
-        child.countTotalDistance();
-        child.setParent(this);
-        children.add(child);
-
+        for (int i = 0; i < 12; i++) {
+            Cube child = new Cube(this.tiles, counter, this.K);
+            child.setParent(this);
+            switch (i) {
+                case 0 -> child.F_r();
+                case 1 -> child.F_l();
+                case 2 -> child.R_r();
+                case 3 -> child.R_l();
+                case 4 -> child.B_r();
+                case 5 -> child.B_l();
+                case 6 -> child.L_r();
+                case 7 -> child.L_l();
+                case 8 -> child.U_r();
+                case 9 -> child.U_l();
+                case 10 -> child.D_r();
+                case 11 -> child.D_l();
+            }
+            if (heuristic == 0) child.countTotalDistanceCornersEdges();
+            if (heuristic == 1) child.countTotalDistance();
+            children.add(child);
+        }
         return children;
     }
 
@@ -258,7 +222,7 @@ public class Cube implements RubikCube, Comparable<Cube> {
             tileA = this.tiles[i][2][1];
             tileB = solved[i][2][1];
             distanceEdges += getDistance(tileA, tileB);
-            this.updateScore((distanceCorners + distanceEdges)/ 24);
+            this.updateScore((distanceCorners / 12 + distanceEdges / 8));
         }
     }
 
@@ -280,9 +244,12 @@ public class Cube implements RubikCube, Comparable<Cube> {
     }
 
     // Generate a random cube.
-    public void randomize() {
+    public void randomize(int lowerBoundInclusive, int upperBoundExclusive) {
+        if (lowerBoundInclusive < 0 || upperBoundExclusive  <= lowerBoundInclusive ) {
+            throw new IllegalArgumentException("Lower bound must be greater than 0, upper bound must be greater than lower bound.");
+        }
         Random random = new Random();
-        int n = random.nextInt(10, 15);
+        int n = random.nextInt(lowerBoundInclusive, upperBoundExclusive);
         for (int i = 0; i < n; i++) {
             int m = random.nextInt(12);
             switch (m) {

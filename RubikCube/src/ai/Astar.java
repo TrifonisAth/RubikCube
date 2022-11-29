@@ -16,7 +16,7 @@ public class Astar {
     }
 
     // A* algorithm with closed set.
-    public Cube AstarClosedSet(Cube initialState){
+    public Cube AstarClosedSet(Cube initialState, int heuristic){
         int counter = 0;
         if(initialState.isSolved()) return initialState;
         // step 1: put initial state in the frontier.
@@ -33,9 +33,9 @@ public class Astar {
             // else go to step 2.
             if(!this.closedSet.contains(currentState))
             {
-                ++counter;
+                counter += 1;
                 this.closedSet.add(currentState);
-                this.frontier.addAll(currentState.getChildren(counter));
+                this.frontier.addAll(currentState.getChildren(counter, heuristic)); // 0 for corner-edges heuristic, 1 for total distance heuristic.
                 // step 6: sort the frontier based on the heuristic score to get best as first
                 Collections.sort(this.frontier); // sort the frontier to get best as first
             }
